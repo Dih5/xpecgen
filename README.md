@@ -6,9 +6,9 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 
 * [Features](#features)
 * [Usage example](#usage-example)
-* [Requisites](#Requisites)
-    * [The easy way](#Requisites-easy)
-	* [The DIY way (might be easier)](#Requisites-diy)
+* [Requisites](#requisites)
+	* [The easy way](#the-easy-way)
+	* [The DIY way (might be easier)](#the-diy-way-might-be-easier)
 * [Download and run](#Download)
 * [License](#license)
 * [Versioning](#versioning)
@@ -23,9 +23,11 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 * Export to xlsx files (Excel Spreadsheet)
 
 ## Usage example
-![alt tag](https://raw.github.com/dih5/xpecgen/master/img/a.png)
+### GUI
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/b.png)
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/c.png)
+### Console
+![alt tag](https://raw.github.com/dih5/xpecgen/master/img/a.png)
 
 ## Requisites
 You need python3 with the following packages to run this program:
