@@ -1,0 +1,116 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      3521,        107]
+NotebookOptionsPosition[      3170,         91]
+NotebookOutlinePosition[      3514,        106]
+CellTagsIndexPosition[      3471,        103]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ "Use package ",
+ ButtonBox["PhysDataFetch",
+  BaseStyle->"Hyperlink",
+  ButtonData->{
+    URL["https://github.com/Dih5/PhysDataFetch"], None},
+  ButtonNote->"https://github.com/Dih5/PhysDataFetch"],
+ " from the web"
+}], "Text",
+ CellChangeTimes->{{3.669959354917425*^9, 3.6699593629652576`*^9}, {
+  3.670070053726509*^9, 3.670070053726509*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Get", "[", 
+  "\"\<https://raw.githubusercontent.com/dih5/PhysDataFetch/master/\
+PhysDataFetch/PhysDataFetch.m\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.669958517698483*^9, 3.66995853171284*^9}, {
+  3.669959350632166*^9, 3.669959352606275*^9}}],
+
+Cell["Run this cell with given Z to fetch element data", "Text",
+ CellChangeTimes->{{3.669959366435445*^9, 3.669959401882936*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"With", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"Z", "=", "74"}], "}"}], ",", 
+    RowBox[{"Export", "[", 
+     RowBox[{
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"NotebookDirectory", "[", "]"}], ",", 
+         RowBox[{
+          RowBox[{"ToString", "[", "Z", "]"}], "<>", "\"\<.csv\>\""}]}], 
+        "}"}], "]"}], ",", 
+      RowBox[{"Transpose", "[", 
+       RowBox[{
+        RowBox[{"Map", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"1000", ",", 
+              RowBox[{
+               RowBox[{"ElementData", "[", 
+                RowBox[{"Z", ",", "\"\<Density\>\""}], "]"}], "/", 
+               RowBox[{"Quantity", "[", 
+                RowBox[{"1", ",", "\"\<g/cm^3\>\""}], "]"}]}], ",", 
+              RowBox[{
+               RowBox[{"ElementData", "[", 
+                RowBox[{"Z", ",", "\"\<Density\>\""}], "]"}], "/", 
+               RowBox[{"Quantity", "[", 
+                RowBox[{"1", ",", "\"\<g/cm^3\>\""}], "]"}]}]}], "}"}], "*", 
+            "#"}], "&"}], ",", 
+          RowBox[{"XRayData", "[", 
+           RowBox[{"Z", ",", 
+            RowBox[{"SeparateBorder", "\[Rule]", "True"}]}], "]"}]}], "]"}], 
+        "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "2"}], "}"}]}], "]"}], "]"}], "]"}]}], "]"}]}], 
+   "]"}], ";"}]], "Input",
+ CellChangeTimes->{{3.6699585714844093`*^9, 3.669958582229065*^9}, {
+  3.669958762964938*^9, 3.669958802732996*^9}, {3.669958928775113*^9, 
+  3.669958958168311*^9}, {3.669959150229224*^9, 3.669959174556209*^9}, {
+  3.669959245841234*^9, 3.669959296386799*^9}, {3.669959374268508*^9, 
+  3.669959387837386*^9}, {3.670070036244915*^9, 3.6700700593252707`*^9}}]
+},
+WindowSize->{808, 911},
+WindowMargins->{{167, Automatic}, {0, Automatic}},
+FrontEndVersion->"10.3 for Microsoft Windows (64-bit) (October 9, 2015)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 361, 10, 30, "Text"],
+Cell[922, 32, 271, 5, 52, "Input"],
+Cell[1196, 39, 130, 1, 30, "Text"],
+Cell[1329, 42, 1837, 47, 112, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)
