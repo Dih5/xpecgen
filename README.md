@@ -9,7 +9,7 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 * [Requisites](#requisites)
 	* [The easy way](#the-easy-way)
 	* [The DIY way (might be easier)](#the-diy-way-might-be-easier)
-* [Download and run](#Download)
+* [Download and run](#download-and-run)
 * [License](#license)
 * [Versioning](#versioning)
 * [Model details](#model-details)
@@ -41,6 +41,7 @@ For example you can try [Anaconda](https://www.continuum.io/downloads). Make sur
 ###The DIY way (might be easier):
 - Download [python 3.X](https://www.python.org/) for your OS.
 - Install the additional packages. See specific instructions below.
+
 #### Windows
 As a general advice, forget it. Scipy depends on lots of C, Cython and Fortran code that needs to be compiled before use.
 I suggest you just go for [the easy way](#Requisites-easy).
@@ -50,6 +51,7 @@ There are also some alternatives which are actually Linux in disguise:
 - In Windows 10 you can make use of the bash shell to install from the Ubuntu repositories. Check out [this guide](http://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) and the Ubuntu specific instructions. (I have not tested this yet).
 - Install Ubuntu (or any other Linux) in a virtual machine using [VirtualBox](https://www.virtualbox.org/).
 - [Switch to Linux](https://www.google.com/search?q=why+switch+to+linux).
+
 #### Ubuntu
 (Not tested)
 ```bash
