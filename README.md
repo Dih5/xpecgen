@@ -1,5 +1,6 @@
 # xpecgen
-
+[![release v0.1.0](http://img.shields.io/badge/release-v0.1.0-orange.svg)](https://github.com/dih5/xpecgen/releases/latest)
+[![license GNU GPLv3](https://img.shields.io/badge/license-GNU%20GPLv3-blue.svg)](https://raw.githubusercontent.com/Dih5/xpecgen/master/LICENSE.txt)
 [![Semantic Versioning](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in tungsten anodes.
@@ -17,7 +18,7 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 * [References](#references)
 
 ## Features
-* X-ray spectra calculation using the models from \[1\].
+* X-ray spectra calculation using the models from [\[1\]](#Ref1).
 * HVL calculation
 * Python library and Graphical User Interface
 * Export to xlsx files (Excel Spreadsheet)
@@ -29,10 +30,16 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 ### Console
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/a.png)
 
+## Quick start
+1. Make sure you meet the [requisites](#requisites).
+2. [Download and run](#download-and-run).
+
 ## Requisites
 You need python3 with the following packages to run this program:
+```
 matplotlib, numpy, scipy, XlsxWriter, tk
-The last one is only needed if you want to make use of the GUI.
+```
+The last one is only needed if you want to make use of the GUI. You can install them [the easy way](#the-easy-way) or you can install [only what you need](#the-diy-way-might-be-easier). The first is recommended for Windows users, the latter for Linux users.
 
 ###The easy way
 Install a scientific python distribution providing all these packages.
@@ -44,7 +51,7 @@ For example you can try [Anaconda](https://www.continuum.io/downloads). Make sur
 
 #### Windows
 As a general advice, forget it. Scipy depends on lots of C, Cython and Fortran code that needs to be compiled before use.
-I suggest you just go for [the easy way](#Requisites-easy).
+I suggest you just go for [the easy way](#the-easy-way).
 Still, if you have tried and somehow managed to complete this odyssey I would be glad to hear your tale.
 
 There are also some alternatives which are actually Linux in disguise:
@@ -90,13 +97,13 @@ Releases of this package will be numbered using
 [Semantic Versioning guidelines](http://semver.org/).
 
 ## Model details
-To have a general overview of the model see \[1\].
+To have a general overview of the model see [\[1\]](#Ref1).
 The bremsstrahlung calculation is done using full interpolations for the electron fluence, so none of the simplifications in section IV.C were used in this implementation.
 Both characteristic peaks models in section II.D were implemented. The polynomial one is used by default.
 Half-value layers are calculated using the exponential model of attenuation (aka narrow beam geometry). In the GUI they are calculated in the sense of dose, but the library allows for generalizing this to any desired reponse function.
 
 ## Citation
-If you use this application to make use of the models in \[1\], you should cite it.
+If you use this application to make use of the models in [\[1\]](#Ref1), you should cite it.
 
 ##References
-\[1\] Hernández, G., Fernández F. (in press). A model of tungsten x-ray anode spectra. *Medical Physics*.
+<a name="Ref1">\[1\]</a> Hernández, G., Fernández F. (in press). A model of tungsten x-ray anode spectra. *Medical Physics*.
