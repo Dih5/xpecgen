@@ -60,10 +60,9 @@ There are also some alternatives which are actually Linux in disguise:
 - [Switch to Linux](https://www.google.com/search?q=why+switch+to+linux).
 
 #### Ubuntu
-(Not tested)
 ```bash
 sudo apt-get update
-sudo apt-get install python3 python-matplotlib python-numpy cython python-scipy python-xlsxwriter python-tk
+sudo apt-get install python3 python3-matplotlib python3-numpy python3-scipy python3-xlsxwriter python3-tk
 ```
 #### Arch Linux
 ```bash
