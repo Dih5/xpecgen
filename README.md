@@ -105,4 +105,4 @@ Half-value layers are calculated using the exponential model of attenuation (aka
 If you use this application to make use of the models in [\[1\]](#Ref1), you should cite it.
 
 ##References
-<a name="Ref1">\[1\]</a> Hernández, G., Fernández F. (in press). A model of tungsten x-ray anode spectra. *Medical Physics*.
+<a name="Ref1">\[1\]</a> Hernández, G., Fernández F. 2016. "A model of tungsten x-ray anode spectra." Medical Physics, *43* 4655. [doi:10.1118/1.4955120](http://dx.doi.org/10.1118/1.4955120)
