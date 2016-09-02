@@ -289,10 +289,10 @@ class XpecgenGUI(Notebook):
         self.scrollHistory.grid(row=0, column=1, sticky=N + S)
         self.lstHistory.config(yscrollcommand=self.scrollHistory.set)
         self.scrollHistory.config(command=self.lstHistory.yview)
-        self.cmdCleanHistory = Button(self.frmHist, text="Revert to selected")
+        self.cmdCleanHistory = Button(self.frmHist, text="Revert to selected", state=DISABLED)
         self.cmdCleanHistory["command"] = self.clean_history
         self.cmdCleanHistory.grid(row=1, column=0, columnspan=2,sticky=E + W)
-        self.cmdExport = Button(self.frmHist, text="Export selected")
+        self.cmdExport = Button(self.frmHist, text="Export selected", state=DISABLED)
         self.cmdExport["command"] = self.export
         self.cmdExport.grid(row=2, column=0, columnspan=2,sticky=E + W)
 
@@ -325,7 +325,7 @@ class XpecgenGUI(Notebook):
         self.cmbAttenMaterial.grid(row=0, column=1, sticky=E + W)
         self.ParAttenThick = ParBox(
             self.frmOperAtten, self.AttenThick, lblText="Thickness", unitsTxt="cm", row=1)
-        self.cmdAtten = Button(self.frmOperAtten, text="Add attenuation")
+        self.cmdAtten = Button(self.frmOperAtten, text="Add attenuation", state=DISABLED)
         self.cmdAtten["command"] = self.attenuate
         self.cmdAtten.grid(row=2, column=0, columnspan=3, sticky=E + W)
         Grid.columnconfigure(self.frmOperAtten, 0, weight=0)
@@ -380,7 +380,9 @@ class XpecgenGUI(Notebook):
         
     def enable_analyze_buttons(self):
         """Enable widgets requiring a calculated spectrum to work"""
-        #TODO: Write me
+        self.cmdCleanHistory["state"] = "normal"
+        self.cmdExport["state"] = "normal"
+        self.cmdAtten["state"] = "normal"
         pass
 
     def update_plot(self):
