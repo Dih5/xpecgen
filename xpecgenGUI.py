@@ -442,6 +442,8 @@ class XpecgenGUI(Notebook):
         options['parent'] = self
         options['title'] = 'Export spectrum'
         filename = asksaveasfilename(**file_opt)
+        if not filename: #Ignore if canceled
+            return
         ext=filename.split(".")[-1]
 
         if ext=="xlsx":
