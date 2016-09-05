@@ -213,6 +213,12 @@ class XpecgenGUI(Notebook):
         self.AttenThick = DoubleVar()
         self.AttenThick.set(0.1)
         
+        self.NormCriterium = StringVar()
+        self.NormCriterium.set("Number")
+        
+        self.NormValue = DoubleVar()
+        self.NormValue.set(1.0)
+        
         #Output HVLs
         self.HVL1 = StringVar()
         self.HVL1.set("0")
@@ -331,6 +337,25 @@ class XpecgenGUI(Notebook):
         Grid.columnconfigure(self.frmOperAtten, 0, weight=0)
         Grid.columnconfigure(self.frmOperAtten, 1, weight=1)
         Grid.columnconfigure(self.frmOperAtten, 2, weight=0)
+        
+        #--Normalize
+        self.frmOperNorm = LabelFrame(self.frmOper, text="Normalize")
+        self.frmOperNorm.grid(row=1, column=0, sticky=N + S + E + W)
+        self.lblNormCriterium = Label(self.frmOperNorm, text="Criterium")
+        self.lblNormCriterium.grid()
+        self.cmbNormCriterium = Combobox(
+            self.frmOperNorm, textvariable=self.NormCriterium)
+        self.criteriumList = ["Number", "Energy (keV)", "Dose"]
+        self.cmbNormCriterium["values"] = self.criteriumList
+        self.cmbNormCriterium.grid(row=0, column=1, sticky=E + W)
+        self.ParNormValue = ParBox(
+            self.frmOperNorm, self.NormValue, lblText="Value", unitsTxt="", row=1)
+        self.cmdNorm = Button(self.frmOperNorm, text="Normalize", state=DISABLED)
+        self.cmdNorm["command"] = self.normalize
+        self.cmdNorm.grid(row=2, column=0, columnspan=3, sticky=E + W)
+        Grid.columnconfigure(self.frmOperNorm, 0, weight=0)
+        Grid.columnconfigure(self.frmOperNorm, 1, weight=1)
+        Grid.columnconfigure(self.frmOperNorm, 2, weight=0)
 
         Grid.columnconfigure(self.frmOper, 0, weight=1)
         Grid.rowconfigure(self.frmOper, 0, weight=1)
@@ -383,6 +408,7 @@ class XpecgenGUI(Notebook):
         self.cmdCleanHistory["state"] = "normal"
         self.cmdExport["state"] = "normal"
         self.cmdAtten["state"] = "normal"
+        self.cmdNorm["state"] = "normal"
         pass
 
     def update_plot(self):
@@ -507,6 +533,31 @@ class XpecgenGUI(Notebook):
         self.spectra.append(s2)
         self.lstHistory.insert(
             END, "Attenuated: " + str(self.AttenThick.get()) + "cm of " + self.AttenMaterial.get())
+        self.lstHistory.selection_clear(0, len(self.spectra) - 2)
+        self.lstHistory.selection_set(len(self.spectra) - 1)
+        self.update_plot()
+        pass
+        
+    def normalize(self):
+        """Normalize the active spectrum"""
+        value=self.NormValue.get()
+        crit = self.NormCriterium.get()
+        if value<=0:
+            messagebox.showerror("Error", "The norm of a spectrum must be a positive number.")
+            return
+        if crit not in self.criteriumList:
+            messagebox.showerror("Error", "An unkown criterium was selected.")
+            return
+        s2 = self.spectra[-1].clone()
+        if crit==self.criteriumList[0]:
+            s2.set_norm(value)
+        elif crit==self.criteriumList[1]:
+            s2.set_norm(value,lambda x:x)
+        else: #criteriumList[2]
+            s2.set_norm(value,self.fluence_to_dose)
+        self.spectra.append(s2)
+        self.lstHistory.insert(
+            END, "Normalized: " + crit + " = " + str(value))
         self.lstHistory.selection_clear(0, len(self.spectra) - 2)
         self.lstHistory.selection_set(len(self.spectra) - 1)
         self.update_plot()
