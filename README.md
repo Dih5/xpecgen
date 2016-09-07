@@ -11,6 +11,7 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 	* [The easy way](#the-easy-way)
 	* [The DIY way (might be easier)](#the-diy-way-might-be-easier)
 * [Download and run](#download-and-run)
+* [Documentation](#documentation)
 * [License](#license)
 * [Versioning](#versioning)
 * [Model details](#model-details)
@@ -85,6 +86,13 @@ Download and extract the [zip file](https://github.com/Dih5/xpecgen/archive/mast
 To start the GUI, open xpecgenGUI.py with your python3 interpreter. In Windows you can use xpecgenGUI.bat to launch it.
 To start the interactive command line mode, start the python interpreter in the directory where the files were extracted and follow the usage example.
 You can also write a custom script following the example in [demo.py](demo.py).
+
+##Documentation
+You can use the python help system to check the library documentation:
+```python3
+import xpecgen as xg
+help(xg)
+```
 
 ##License
 This package is released under
