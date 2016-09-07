@@ -14,6 +14,7 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 * [Documentation](#documentation)
 * [License](#license)
 * [Versioning](#versioning)
+* [Requests](#requests)
 * [Model details](#model-details)
 * [Citation](#citation)
 * [References](#references)
@@ -102,6 +103,10 @@ This package is released under
 ## Versioning
 Releases of this package will be numbered using
 [Semantic Versioning guidelines](http://semver.org/).
+
+## Requests
+If you find any bugs or have a feature request you may create an [issue on GitHub](https://github.com/dih5/xpecgen/issues).
+You may also considering forking and sending a pull request if you are an experienced developer.
 
 ## Model details
 To have a general overview of the model see [\[1\]](#Ref1).
