@@ -228,6 +228,13 @@ class XpecgenGUI(Notebook):
         self.HVL3.set("0")
         self.HVL4 = StringVar()
         self.HVL4.set("0")
+        #Output Norms
+        self.number = StringVar()
+        self.number.set("0")
+        self.energy = StringVar()
+        self.energy.set("0")
+        self.dose = StringVar()
+        self.dose.set("0")
 
     def createWidgets(self):
         """Create the widgets in the GUI"""
@@ -387,12 +394,15 @@ class XpecgenGUI(Notebook):
             print("WARNING: Matplotlib couldn't be embedded in TkAgg.\nUsing independent window instead", file=sys.stderr)
             
         #--HVL frame
-        self.frmHVL = LabelFrame(self.frmAnal, text="HVL values")
-        self.frmHVL.grid(row=2, column=0, sticky= S + E + W)
-        self.ParHVL1 = ParBox(self.frmHVL, self.HVL1, lblText="1HVL Al", unitsTxt="cm", row=0, read_only=True)
-        self.ParHVL2 = ParBox(self.frmHVL, self.HVL2, lblText="2HVL Al", unitsTxt="cm", row=1, read_only=True)
-        self.ParHVL3 = ParBox(self.frmHVL, self.HVL3, lblText="1HVL Cu", unitsTxt="cm", row=2, read_only=True)
-        self.ParHVL4 = ParBox(self.frmHVL, self.HVL4, lblText="2HVL Cu", unitsTxt="cm", row=3, read_only=True)
+        self.frmSpectralParameters = LabelFrame(self.frmAnal, text="Spectral parameters")
+        self.frmSpectralParameters.grid(row=2, column=0, sticky= S + E + W)
+        self.ParHVL1 = ParBox(self.frmSpectralParameters, self.HVL1, lblText="1HVL Al", unitsTxt="cm", row=0, read_only=True)
+        self.ParHVL2 = ParBox(self.frmSpectralParameters, self.HVL2, lblText="2HVL Al", unitsTxt="cm", row=1, read_only=True)
+        self.ParHVL3 = ParBox(self.frmSpectralParameters, self.HVL3, lblText="1HVL Cu", unitsTxt="cm", row=2, read_only=True)
+        self.ParHVL4 = ParBox(self.frmSpectralParameters, self.HVL4, lblText="2HVL Cu", unitsTxt="cm", row=3, read_only=True)
+        self.ParNorm = ParBox(self.frmSpectralParameters, self.number, lblText="Photon number", unitsTxt="", row=4, read_only=True)
+        self.ParEnergy = ParBox(self.frmSpectralParameters, self.energy, lblText="Energy", unitsTxt="keV", row=5, read_only=True)
+        self.ParDose = ParBox(self.frmSpectralParameters, self.dose, lblText="Dose", unitsTxt="Gy", row=6, read_only=True)
        
 
         Grid.columnconfigure(self.frmAnal, 0, weight=1)
@@ -426,10 +436,10 @@ class XpecgenGUI(Notebook):
         else:
             # FIXME: Update if independent window is oppened
             self.spectra[self.active_spec].show_plot(block=False)
-        self.update_hvl()
+        self.update_param()
         
-    def update_hvl(self):
-        """Update calculated HVL"""
+    def update_param(self):
+        """Update parameters calculated from the active spectrum"""
         hvlAl=self.spectra[self.active_spec].hvl(0.5,self.fluence_to_dose,self.mu_Al)
         qvlAl=self.spectra[self.active_spec].hvl(0.25,self.fluence_to_dose,self.mu_Al)
 
@@ -441,6 +451,10 @@ class XpecgenGUI(Notebook):
         self.HVL2.set('%s' % float('%.3g' % (qvlAl-hvlAl)))
         self.HVL3.set('%s' % float('%.3g' % hvlCu))
         self.HVL4.set('%s' % float('%.3g' % (qvlCu-hvlCu)))
+        
+        self.number.set('%s' % float('%.3g' % (self.spectra[self.active_spec].get_norm())))
+        self.energy.set('%s' % float('%.3g' % (self.spectra[self.active_spec].get_norm(lambda x:x))))
+        self.dose.set('%s' % float('%.3g' % (self.spectra[self.active_spec].get_norm(self.fluence_to_dose))))
 
     def monitor_bar(self, a, b):
         """Update the progress bar"""
