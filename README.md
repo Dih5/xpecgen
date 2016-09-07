@@ -7,6 +7,7 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 
 * [Features](#features)
 * [Usage example](#usage-example)
+* [Quick start](#quick-start)
 * [Requisites](#requisites)
 	* [The easy way](#the-easy-way)
 	* [The DIY way (might be easier)](#the-diy-way-might-be-easier)
