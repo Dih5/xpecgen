@@ -1,4 +1,4 @@
-# fluence data
+# Fluence data
 This folder contains files describing electron penetration in tungsten.
 
 **Origin:** the set of FLUKA simulations explained in the [model paper](http://dx.doi.org/10.1118/1.4955120).
@@ -7,7 +7,7 @@ This folder contains files describing electron penetration in tungsten.
 
 **File list:**
 - [Grid.csv](grid.csv)
-- [E0.csv](e0.csv)
+- [E0.csv](100.csv)
 
 
 ## Grid.csv
