@@ -352,7 +352,7 @@ class XpecgenGUI(Notebook):
         self.lblNormCriterium.grid()
         self.cmbNormCriterium = Combobox(
             self.frmOperNorm, textvariable=self.NormCriterium)
-        self.criteriumList = ["Number", "Energy (keV)", "Dose"]
+        self.criteriumList = ["Number", "Energy (keV)", "Dose (mGy)"]
         self.cmbNormCriterium["values"] = self.criteriumList
         self.cmbNormCriterium.grid(row=0, column=1, sticky=E + W)
         self.ParNormValue = ParBox(
@@ -402,7 +402,7 @@ class XpecgenGUI(Notebook):
         self.ParHVL4 = ParBox(self.frmSpectralParameters, self.HVL4, lblText="2HVL Cu", unitsTxt="cm", row=3, read_only=True)
         self.ParNorm = ParBox(self.frmSpectralParameters, self.number, lblText="Photon number", unitsTxt="", row=4, read_only=True)
         self.ParEnergy = ParBox(self.frmSpectralParameters, self.energy, lblText="Energy", unitsTxt="keV", row=5, read_only=True)
-        self.ParDose = ParBox(self.frmSpectralParameters, self.dose, lblText="Dose", unitsTxt="Gy", row=6, read_only=True)
+        self.ParDose = ParBox(self.frmSpectralParameters, self.dose, lblText="Dose", unitsTxt="mGy", row=6, read_only=True)
        
 
         Grid.columnconfigure(self.frmAnal, 0, weight=1)
