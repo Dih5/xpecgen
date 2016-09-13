@@ -213,8 +213,8 @@ class XpecgenGUI(Notebook):
         self.AttenThick = DoubleVar()
         self.AttenThick.set(0.1)
         
-        self.NormCriterium = StringVar()
-        self.NormCriterium.set("Number")
+        self.NormCriterion = StringVar()
+        self.NormCriterion.set("Number")
         
         self.NormValue = DoubleVar()
         self.NormValue.set(1.0)
@@ -348,13 +348,13 @@ class XpecgenGUI(Notebook):
         #--Normalize
         self.frmOperNorm = LabelFrame(self.frmOper, text="Normalize")
         self.frmOperNorm.grid(row=1, column=0, sticky=N + S + E + W)
-        self.lblNormCriterium = Label(self.frmOperNorm, text="Criterium")
-        self.lblNormCriterium.grid()
-        self.cmbNormCriterium = Combobox(
-            self.frmOperNorm, textvariable=self.NormCriterium)
-        self.criteriumList = ["Number", "Energy (keV)", "Dose (mGy)"]
-        self.cmbNormCriterium["values"] = self.criteriumList
-        self.cmbNormCriterium.grid(row=0, column=1, sticky=E + W)
+        self.lblNormCriterion = Label(self.frmOperNorm, text="Criterion")
+        self.lblNormCriterion.grid()
+        self.cmbNormCriterion = Combobox(
+            self.frmOperNorm, textvariable=self.NormCriterion)
+        self.criteriaList = ["Number", "Energy (keV)", "Dose (mGy)"]
+        self.cmbNormCriterion["values"] = self.criteriaList
+        self.cmbNormCriterion.grid(row=0, column=1, sticky=E + W)
         self.ParNormValue = ParBox(
             self.frmOperNorm, self.NormValue, lblText="Value", unitsTxt="", row=1)
         self.cmdNorm = Button(self.frmOperNorm, text="Normalize", state=DISABLED)
@@ -555,19 +555,19 @@ class XpecgenGUI(Notebook):
     def normalize(self):
         """Normalize the active spectrum"""
         value=self.NormValue.get()
-        crit = self.NormCriterium.get()
+        crit = self.NormCriterion.get()
         if value<=0:
             messagebox.showerror("Error", "The norm of a spectrum must be a positive number.")
             return
-        if crit not in self.criteriumList:
-            messagebox.showerror("Error", "An unkown criterium was selected.")
+        if crit not in self.criteriaList:
+            messagebox.showerror("Error", "An unkown criterion was selected.")
             return
         s2 = self.spectra[-1].clone()
-        if crit==self.criteriumList[0]:
+        if crit==self.criteriaList[0]:
             s2.set_norm(value)
-        elif crit==self.criteriumList[1]:
+        elif crit==self.criteriaList[1]:
             s2.set_norm(value,lambda x:x)
-        else: #criteriumList[2]
+        else: #criteriaList[2]
             s2.set_norm(value,self.fluence_to_dose)
         self.spectra.append(s2)
         self.lstHistory.insert(
