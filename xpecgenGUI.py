@@ -393,16 +393,16 @@ class XpecgenGUI(Notebook):
             # self.cmdShowPlot.grid(row=0,column=0)
             print("WARNING: Matplotlib couldn't be embedded in TkAgg.\nUsing independent window instead", file=sys.stderr)
             
-        #--HVL frame
+        #--Spectral parameters frame
         self.frmSpectralParameters = LabelFrame(self.frmAnal, text="Spectral parameters")
         self.frmSpectralParameters.grid(row=2, column=0, sticky= S + E + W)
-        self.ParHVL1 = ParBox(self.frmSpectralParameters, self.HVL1, lblText="1HVL Al", unitsTxt="cm", row=0, read_only=True)
-        self.ParHVL2 = ParBox(self.frmSpectralParameters, self.HVL2, lblText="2HVL Al", unitsTxt="cm", row=1, read_only=True)
-        self.ParHVL3 = ParBox(self.frmSpectralParameters, self.HVL3, lblText="1HVL Cu", unitsTxt="cm", row=2, read_only=True)
-        self.ParHVL4 = ParBox(self.frmSpectralParameters, self.HVL4, lblText="2HVL Cu", unitsTxt="cm", row=3, read_only=True)
-        self.ParNorm = ParBox(self.frmSpectralParameters, self.number, lblText="Photon number", unitsTxt="", row=4, read_only=True)
-        self.ParEnergy = ParBox(self.frmSpectralParameters, self.energy, lblText="Energy", unitsTxt="keV", row=5, read_only=True)
-        self.ParDose = ParBox(self.frmSpectralParameters, self.dose, lblText="Dose", unitsTxt="mGy", row=6, read_only=True)
+        self.ParHVL1 = ParBox(self.frmSpectralParameters, self.HVL1, lblText="1HVL Al", unitsTxt="cm", row=0, read_only=True, helpTxt="Thickness of Al at which the dose produced by the spectrum is halved, according to the exponential attenuation model.")
+        self.ParHVL2 = ParBox(self.frmSpectralParameters, self.HVL2, lblText="2HVL Al", unitsTxt="cm", row=1, read_only=True, helpTxt="Thickness of Al at which the dose produced by the spectrum after crossing a HVL is halved again, according to the exponential attenuation model.")
+        self.ParHVL3 = ParBox(self.frmSpectralParameters, self.HVL3, lblText="1HVL Cu", unitsTxt="cm", row=2, read_only=True, helpTxt="Thickness of Cu at which the dose produced by the spectrum is halved, according to the exponential attenuation model.")
+        self.ParHVL4 = ParBox(self.frmSpectralParameters, self.HVL4, lblText="2HVL Cu", unitsTxt="cm", row=3, read_only=True, helpTxt="Thickness of Cu at which the dose produced by the spectrum after crossing a HVL is halved again, according to the exponential attenuation model.")
+        self.ParNorm = ParBox(self.frmSpectralParameters, self.number, lblText="Photon number", unitsTxt="", row=4, read_only=True, helpTxt="Number of photons in the spectrum.")
+        self.ParEnergy = ParBox(self.frmSpectralParameters, self.energy, lblText="Energy", unitsTxt="keV", row=5, read_only=True, helpTxt="Total energy in the spectrum.")
+        self.ParDose = ParBox(self.frmSpectralParameters, self.dose, lblText="Dose", unitsTxt="mGy", row=6, read_only=True, helpTxt="Dose produced in air by the spectrum, assuming it is describing the differential fluence in particles/keV/cm^2.")
        
 
         Grid.columnconfigure(self.frmAnal, 0, weight=1)
