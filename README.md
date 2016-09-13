@@ -1,5 +1,5 @@
 # xpecgen
-[![release v0.1.0](http://img.shields.io/badge/release-v0.1.0-orange.svg)](https://github.com/dih5/xpecgen/releases/latest)
+[![release v1.0.0](http://img.shields.io/badge/release-v1.0.0-green.svg)](https://github.com/dih5/xpecgen/releases/latest)
 [![license GNU GPLv3](https://img.shields.io/badge/license-GNU%20GPLv3-blue.svg)](https://raw.githubusercontent.com/Dih5/xpecgen/master/LICENSE.txt)
 [![Semantic Versioning](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
@@ -22,16 +22,16 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 
 ## Features
 * X-ray spectra calculation using the models from [\[1\]](#Ref1).
-* HVL calculation
-* Python library and Graphical User Interface
-* Export to xlsx files (Excel Spreadsheet)
+* HVL calculation.
+* Python library and Graphical User Interface.
+* Export to xlsx files (Excel Spreadsheet).
 
 ## Usage example
 ### GUI
-![alt tag](https://raw.github.com/dih5/xpecgen/master/img/b.png)
-![alt tag](https://raw.github.com/dih5/xpecgen/master/img/c.png)
+![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoPar.png)
+![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoPlot.png)
 ### Console
-![alt tag](https://raw.github.com/dih5/xpecgen/master/img/a.png)
+![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoConsole.png)
 
 ## Quick start
 1. Make sure you meet the [requisites](#requisites).
