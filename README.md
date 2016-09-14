@@ -105,8 +105,12 @@ You can also write a custom script following the example in [demo.py](demo.py).
 ##Documentation
 You can use the python help system to check the library documentation:
 ```python3
-import xpecgen as xg
+from xpecgen import xpecgen as xg
 help(xg)
+```
+If not installed as a package import instead with
+```python3
+import xpecgen as xg
 ```
 
 ##License
