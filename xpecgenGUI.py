@@ -60,7 +60,11 @@ from glob import glob
 
 import re #Regular expressions, used for sorting
 
-import xpecgen as xg
+try:
+    from . import xpecgen as xg
+except SystemError: #If not loaded as package
+    import xpecgen as xg
+
 
 
 class CreateToolTip(object):
@@ -577,8 +581,10 @@ class XpecgenGUI(Notebook):
         self.update_plot()
         pass
 
-
-if __name__ == "__main__":
+def main():
     root = Tk()
     app = XpecgenGUI(master=root)
     app.mainloop()
+
+if __name__ == "__main__":
+    main()
