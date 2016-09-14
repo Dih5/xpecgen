@@ -34,6 +34,18 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoConsole.png)
 
 ## Quick start
+If you have [pip](https://pip.pypa.io/en/stable/installing/) installed you can install xpecgen as a package by running
+```
+pip install --upgrade xpecgen
+```
+and then you can launch the GUI by just executing
+```
+xpecgen
+```
+or check the [demo.py](demo.py) explaining its use as a library.
+
+If you do not want to use pip then:
+
 1. Make sure you meet the [requisites](#requisites).
 2. [Download and run](#download-and-run).
 
@@ -47,10 +59,11 @@ The last one is only needed if you want to make use of the GUI. You can install 
 ###The easy way
 Install a scientific python distribution providing all these packages.
 For example you can try [Anaconda](https://www.continuum.io/downloads). Make sure you choose the python 3.X installer.
+Since this will install pip, you might want to use the [pip installer](#quick-start).
 
 ###The DIY way (might be easier):
 - Download [python 3.X](https://www.python.org/) for your OS.
-- Install the additional packages. See specific instructions below.
+- Use the [pip installer](#quick-start) (recommended) or manually install the additional packages. See specific instructions below.
 
 #### Windows
 As a general advice, forget it. Scipy depends on lots of C, Cython and Fortran code that needs to be compiled before use.
