@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 #xpecgen script example
-import xpecgen as xg
+try:
+    from xpecgen import xpecgen as xg
+except ImportError: #If not installed as a package
+    import xpecgen as xg
 
 #Define some parameters
 E0=100

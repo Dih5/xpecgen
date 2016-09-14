@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-import xpecgen as xg
+try:
+    from xpecgen import xpecgen as xg
+except ImportError: #If not installed as a package
+    import xpecgen as xg
 
 #Example of script to reproduce the values in Table III of Med. Phys. 43, 4655 (2016);
 
