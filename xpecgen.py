@@ -57,6 +57,10 @@ import csv
 import xlsxwriter
 
 
+data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"data")
+
+
+
 #--------------------General purpose functions-------------------------#
 
 def logInterp1d(xx, yy, kind='linear'):
@@ -291,12 +295,12 @@ def get_fluence(E0=100):
     """Returns a function representing fluence(x,u) with x in CSDA units"""
     # List of available energies
     E0_str_list = list(map(lambda x: (os.path.split(x)[1]).split(".csv")[
-                       0], glob(os.path.join(".", "data", "fluence", "*.csv"))))
+                       0], glob(os.path.join(data_path, "fluence", "*.csv"))))
     E0_list = sorted(list(map(int, list(filter(str.isdigit, E0_str_list)))))
 
     E_closest = min(E0_list, key=lambda x: abs(x - E0))
 
-    with open("data/fluence/grid.csv", 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"fluence/grid.csv"), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -304,7 +308,7 @@ def get_fluence(E0=100):
         t = next(r)
         u = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open("".join(["data/fluence/", str(E_closest), ".csv"]), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"fluence","".join([str(E_closest), ".csv"])), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -323,7 +327,7 @@ def get_cs(E0=100):
     """
     # NOTE: Data is given for E0>1keV. CS values below this level should be used with caution.
     # The default behaviour is to keep it constant
-    with open("data/cs/grid.csv", 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"cs/grid.csv"), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -332,7 +336,7 @@ def get_cs(E0=100):
         t = next(r)
         k = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open("data/cs/74.csv", 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"cs/74.csv"), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -346,7 +350,7 @@ def get_cs(E0=100):
 
 def get_mu(Z=74):
     """Returns a function representing mu(E) with mu in cm^-1 and E in keV for the given material"""
-    with open("".join(["data/mu/", str(Z), ".csv"]), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"mu","".join([str(Z), ".csv"])), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -358,7 +362,7 @@ def get_mu(Z=74):
 
 def get_csda():
     """Returns a function representing the CSDA range in cm in tungsten as a function of E0 in keV"""
-    with open("data/csda/74.csv", 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"csda/74.csv"), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -377,7 +381,7 @@ def get_mu_csda(E0):
 
 def get_fluence_to_dose():
     """Returns a function representing the weighting factor which converts fluence to dose"""
-    with open("data/fluence2dose/f2d.csv", 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"fluence2dose/f2d.csv"), 'r', newline='') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)

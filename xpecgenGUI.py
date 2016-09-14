@@ -324,7 +324,7 @@ class XpecgenGUI(Notebook):
         self.cmbAttenMaterial = Combobox(
             self.frmOperAtten, textvariable=self.AttenMaterial)
         material_list=list(map(lambda x: (os.path.split(x)[1]).split(
-            ".csv")[0], glob(os.path.join(".", "data", "mu", "*.csv"))))
+            ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
 
 
         def human_order_key(text):
