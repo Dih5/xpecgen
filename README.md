@@ -9,10 +9,10 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 
 * [Features](#features)
 * [Usage example](#usage-example)
-* [Quick start](#quick-start)
+* [Installation](#installation)
 * [Requisites](#requisites)
-	* [The easy way](#the-easy-way)
-	* [The DIY way (might be easier)](#the-diy-way-might-be-easier)
+	* [Install a scientific python distribution](#install-a-scientific-python-distribution)
+	* [Install python and the packages](#install-python-and-the-packages)
 * [Download and run](#download-and-run)
 * [Documentation](#documentation)
 * [License](#license)
@@ -35,42 +35,40 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 ### Console
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoConsole.png)
 
-## Quick start
-If you have [pip](https://pip.pypa.io/en/stable/installing/) installed you can install xpecgen as a package by running
+## Installation
+If you have [pip](https://pip.pypa.io/en/stable/installing/) you can install xpecgen as a package by running
 ```
-pip install --upgrade xpecgen
+pip install xpecgen
 ```
 and then you can launch the GUI by just executing
 ```
 xpecgen
 ```
-or check the [demo.py](demo/demo.py) explaining its use as a library.
+or check the [demo.py](demo/demo.py) explaining its use as a library. You will need tk to make use of the GUI. See the [requisites](#requisites) if you need help for this.
 
-If you do not want to use pip then:
-
-1. Make sure you meet the [requisites](#requisites).
-2. [Download and run](#download-and-run).
+If you do not have python3 installed yet, also check the [requisites](#requisites).
 
 ## Requisites
 You need python3 with the following packages to run this program:
 ```
 matplotlib, numpy, scipy, XlsxWriter, tk
 ```
-The last one is only needed if you want to make use of the GUI. You can install them [the easy way](#the-easy-way) or you can install [only what you need](#the-diy-way-might-be-easier). The first is recommended for Windows users, the latter for Linux users.
+The last one is only needed if you want to make use of the GUI.
 
-###The easy way
-Install a scientific python distribution providing all these packages.
+You can [install a scientific python distribution](#install-a-scientific-python-distribution) providing them or you can install [only what you need](#install-python-and-the-packages). The first is recommended for Windows users, the latter for Linux users.
+
+
+###Install a scientific python distribution:
 For example you can try [Anaconda](https://www.continuum.io/downloads). Make sure you choose the python 3.X installer.
-Since this will install pip, you might want to use the [pip installer](#quick-start).
+Since this will install pip, you might want to use the [pip installer](#installation).
 
-###The DIY way (might be easier):
-- Download [python 3.X](https://www.python.org/) for your OS.
-- Use the [pip installer](#quick-start) (recommended) or manually install the additional packages. See specific instructions below.
+###Install python and the packages:
+- Download [python 3.X](https://www.python.org/) for your OS. See specific instructions to install from repositories below.
+- Use the [pip installer](#Installation) (recommended) or manually install the additional packages. See specific instructions below.
 
 #### Windows
 As a general advice, forget it. Scipy depends on lots of C, Cython and Fortran code that needs to be compiled before use.
-I suggest you just go for [the easy way](#the-easy-way).
-Still, if you have tried and somehow managed to complete this odyssey I would be glad to hear your tale.
+I suggest you just go for [a scientific python distribution](#install-a-scientific-python-distribution).
 
 There are also some alternatives which are actually Linux in disguise:
 - In Windows 10 you can make use of the bash shell to install from the Ubuntu repositories. Check out [this guide](http://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) and the Ubuntu specific instructions. (I have not tested this yet).
@@ -99,10 +97,10 @@ sudo pip install openpyxl
 On Fedora 23 onwards, use dnf instead of yum
 
 ##Download and run
+You can also download and execute the program without installing it, as long as you meet the [requisites](#requisites).
 Download and extract the [zip file](https://github.com/Dih5/xpecgen/archive/master.zip) of the repository.
-To start the GUI, open xpecgenGUI.py with your python3 interpreter. In Windows you can use xpecgenGUI.bat to launch it.
-To start the interactive command line mode, start the python interpreter in the directory where the files were extracted and follow the usage example.
-You can also write a custom script following the example in [demo.py](demo/demo.py).
+To start the GUI, open xpecgen/xpecgenGUI.py with your python3 interpreter. In Windows you can use xpecgenGUI.bat in the same folder to launch it.
+
 
 ##Documentation
 You can use the python help system to check the library documentation:
@@ -110,10 +108,7 @@ You can use the python help system to check the library documentation:
 from xpecgen import xpecgen as xg
 help(xg)
 ```
-If not installed as a package import instead with
-```python3
-import xpecgen as xg
-```
+
 
 ##License
 This package is released under
