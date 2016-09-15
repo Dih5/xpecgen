@@ -44,7 +44,7 @@ and then you can launch the GUI by just executing
 ```
 xpecgen
 ```
-or check the [demo.py](demo.py) explaining its use as a library.
+or check the [demo.py](demo/demo.py) explaining its use as a library.
 
 If you do not want to use pip then:
 
@@ -102,7 +102,7 @@ On Fedora 23 onwards, use dnf instead of yum
 Download and extract the [zip file](https://github.com/Dih5/xpecgen/archive/master.zip) of the repository.
 To start the GUI, open xpecgenGUI.py with your python3 interpreter. In Windows you can use xpecgenGUI.bat to launch it.
 To start the interactive command line mode, start the python interpreter in the directory where the files were extracted and follow the usage example.
-You can also write a custom script following the example in [demo.py](demo.py).
+You can also write a custom script following the example in [demo.py](demo/demo.py).
 
 ##Documentation
 You can use the python help system to check the library documentation:

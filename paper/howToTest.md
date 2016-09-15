@@ -18,5 +18,5 @@ The GUI may be used to test the library is behaving properly. The following line
 ## Overall quantitative check:
 - The HVL ("half-value-layers") are values that depend on the calculated spectrum and on the attenuation functionality. Thus, they can be used to check the results are quantitatively similar to those published in the model paper.
 The values in the paper refer to a calculation with theta=12, phi=0, and attenuated by 1.2 mm of Al and 100 cm of air.
-The script test_hvl.py is prepared to perform this calculations. When it is run the values it displays at the end of its execution should be similar to {2.37, 1.85, 1.20} mm, which the values in the publication.
+The script test_hvl.py in the demo directory is prepared to perform this calculations. When it is run the values it displays at the end of its execution should be similar to {2.37, 1.85, 1.20} mm, which the values in the publication.
 Yes, this could have been written as a unit test... but fixing those values as "the good ones" would make no sense, because if model was changed, they should change.
