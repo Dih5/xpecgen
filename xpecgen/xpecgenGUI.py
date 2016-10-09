@@ -1,7 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 """xpecgenGUI.py: A GUI for the xpecgen module"""
 
+
+from __future__ import print_function
 
 #----------------------------------------------------------------------#
 #                               ,
@@ -43,7 +46,7 @@ __author__ = "Dih5"
 
 from tkinter import *
 from tkinter.ttk import *
-from tkinter.filedialog import asksaveasfilename
+import tkinter.filedialog
 from tkinter import messagebox
 
 import matplotlib
@@ -60,10 +63,8 @@ from glob import glob
 
 import re #Regular expressions, used for sorting
 
-try:
-    from . import xpecgen as xg
-except SystemError: #If not loaded as package
-    import xpecgen as xg
+
+from . import xpecgen as xg
 
 
 
@@ -487,7 +488,7 @@ class XpecgenGUI(Notebook):
         options['initialfile'] = 'spectrum.xlsx'
         options['parent'] = self
         options['title'] = 'Export spectrum'
-        filename = asksaveasfilename(**file_opt)
+        filename = tkinter.filedialog.asksaveasfilename(**file_opt)
         if not filename: #Ignore if canceled
             return
         ext=filename.split(".")[-1]
