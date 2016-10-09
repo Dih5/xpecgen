@@ -257,9 +257,9 @@ class XpecgenGUI(Notebook):
         self.frmPhysPar.grid(row=0, column=0, sticky=N + S + E + W)
         self.ParE0 = ParBox(self.frmPhysPar, self.E0, lblText="Electron Energy (E0)",
                             unitsTxt="keV", helpTxt="Electron kinetic energy in keV.", row=0)
-        self.ParTheta = ParBox(self.frmPhysPar, self.Theta, lblText="Angle (\u03b8)",
+        self.ParTheta = ParBox(self.frmPhysPar, self.Theta, lblText=u"Angle (\u03b8)",
                                unitsTxt="º", helpTxt="X-rays emission angle. The anode's normal is at 90º.", row=1)
-        self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText="Elevation angle (\u03c6)",
+        self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText=u"Elevation angle (\u03c6)",
                              unitsTxt="º", helpTxt="X-rays emission altitude. The anode's normal is at 0º.", row=2)
         Grid.columnconfigure(self.frmPhysPar, 0, weight=0)
         Grid.columnconfigure(self.frmPhysPar, 1, weight=1)
