@@ -1,7 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 """xpecgenGUI.py: A GUI for the xpecgen module"""
 
+
+from __future__ import print_function
 
 #----------------------------------------------------------------------#
 #                               ,
@@ -43,7 +46,7 @@ __author__ = "Dih5"
 
 from tkinter import *
 from tkinter.ttk import *
-from tkinter.filedialog import asksaveasfilename
+import tkinter.filedialog
 from tkinter import messagebox
 
 import matplotlib
@@ -60,10 +63,8 @@ from glob import glob
 
 import re #Regular expressions, used for sorting
 
-try:
-    from . import xpecgen as xg
-except SystemError: #If not loaded as package
-    import xpecgen as xg
+
+from . import xpecgen as xg
 
 
 
@@ -256,9 +257,9 @@ class XpecgenGUI(Notebook):
         self.frmPhysPar.grid(row=0, column=0, sticky=N + S + E + W)
         self.ParE0 = ParBox(self.frmPhysPar, self.E0, lblText="Electron Energy (E0)",
                             unitsTxt="keV", helpTxt="Electron kinetic energy in keV.", row=0)
-        self.ParTheta = ParBox(self.frmPhysPar, self.Theta, lblText="Angle (\u03b8)",
+        self.ParTheta = ParBox(self.frmPhysPar, self.Theta, lblText=u"Angle (\u03b8)",
                                unitsTxt="º", helpTxt="X-rays emission angle. The anode's normal is at 90º.", row=1)
-        self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText="Elevation angle (\u03c6)",
+        self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText=u"Elevation angle (\u03c6)",
                              unitsTxt="º", helpTxt="X-rays emission altitude. The anode's normal is at 0º.", row=2)
         Grid.columnconfigure(self.frmPhysPar, 0, weight=0)
         Grid.columnconfigure(self.frmPhysPar, 1, weight=1)
@@ -487,7 +488,7 @@ class XpecgenGUI(Notebook):
         options['initialfile'] = 'spectrum.xlsx'
         options['parent'] = self
         options['title'] = 'Export spectrum'
-        filename = asksaveasfilename(**file_opt)
+        filename = tkinter.filedialog.asksaveasfilename(**file_opt)
         if not filename: #Ignore if canceled
             return
         ext=filename.split(".")[-1]

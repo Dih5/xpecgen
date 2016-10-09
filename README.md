@@ -1,9 +1,9 @@
 # xpecgen
-[![release v1.0.0](http://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/dih5/xpecgen/releases/latest)
+[![Github release](https://img.shields.io/github/release/dih5/xpecgen.svg)](https://github.com/dih5/xpecgen/releases/latest)
 [![license GNU GPLv3](https://img.shields.io/badge/license-GNU%20GPLv3-blue.svg)](https://raw.githubusercontent.com/Dih5/xpecgen/master/LICENSE.txt)
 [![Semantic Versioning](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 [![PyPI](https://img.shields.io/pypi/v/xpecgen.svg)](https://pypi.python.org/pypi/xpecgen)
-[![status](http://joss.theoj.org/papers/970f9606afd29308e2dcc77216429ee7/status.svg)](http://joss.theoj.org/papers/970f9606afd29308e2dcc77216429ee7)
+[![Joss status](http://joss.theoj.org/papers/970f9606afd29308e2dcc77216429ee7/status.svg)](http://joss.theoj.org/papers/970f9606afd29308e2dcc77216429ee7)
 
 A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in tungsten anodes.
 
@@ -46,10 +46,10 @@ xpecgen
 ```
 or check the [demo.py](demo/demo.py) explaining its use as a library. You will need tk to make use of the GUI. See the [requisites](#requisites) if you need help for this.
 
-If you do not have python3 installed yet, also check the [requisites](#requisites).
+If you do not have python installed yet, also check the [requisites](#requisites).
 
 ## Requisites
-You need python3 with the following packages to run this program:
+You need python (either 2 or 3) with the following packages to run this program:
 ```
 matplotlib, numpy, scipy, XlsxWriter, tk
 ```
@@ -59,12 +59,12 @@ You can [install a scientific python distribution](#install-a-scientific-python-
 
 
 ###Install a scientific python distribution:
-For example you can try [Anaconda](https://www.continuum.io/downloads). Make sure you choose the python 3.X installer.
+For example you can try [Anaconda](https://www.continuum.io/downloads).
 Since this will install pip, you might want to use the [pip installer](#installation).
 
 ###Install python and the packages:
-- Download [python 3.X](https://www.python.org/) for your OS. See specific instructions to install from repositories below.
-- Use the [pip installer](#Installation) (recommended) or manually install the additional packages. See specific instructions below.
+- Download [python](https://www.python.org/) for your OS. See specific instructions to install from repositories below.
+- Use the [pip installer](#Installation) (recommended) or manually install the additional packages. See specific instructions below for installs based on python 3.X.
 
 #### Windows
 As a general advice, forget it. Scipy depends on lots of C, Cython and Fortran code that needs to be compiled before use.
@@ -99,7 +99,10 @@ On Fedora 23 onwards, use dnf instead of yum
 ##Download and run
 You can also download and execute the program without installing it, as long as you meet the [requisites](#requisites).
 Download and extract the [zip file](https://github.com/Dih5/xpecgen/archive/master.zip) of the repository.
-To start the GUI, open xpecgen/xpecgenGUI.py with your python3 interpreter. In Windows you can use xpecgenGUI.bat in the same folder to launch it.
+To start the GUI, open xpecgen/xpecgenGUI.py  as a package with your python interpreter: 
+```bash
+python -m xpecgen.xpecgenGUI
+```
 
 
 ##Documentation

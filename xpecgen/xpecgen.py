@@ -1,6 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 """xpecgen.py: A module to calculate x-ray spectra generated in tungsten anodes"""
+
+from __future__ import print_function
 
 #----------------------------------------------------------------------#
 #                               ,
@@ -37,7 +40,7 @@
 #
 #----------------------------------------------------------------------#
 __author__ = 'Dih5'
-__version__ = "1.0"
+__version__ = "1.0.1-rc1"
 #----------------------------------------------------------------------#
 
 import math
@@ -176,7 +179,7 @@ class Spectrum:
     def export_csv(self, route="a.csv", peak_shape=triangle, transpose=False):
         """Export the data to a csv file (comma-separated values)"""
         x2, y2 = self.get_points(peak_shape=peak_shape)
-        with open(route, 'w', newline='') as csvfile:
+        with open(route, 'w') as csvfile:
             w = csv.writer(csvfile, dialect='excel')
             if transpose:
                 w.writerows([list(a) for a in zip(*[x2, y2])])
@@ -300,7 +303,7 @@ def get_fluence(E0=100):
 
     E_closest = min(E0_list, key=lambda x: abs(x - E0))
 
-    with open(os.path.join(data_path,"fluence/grid.csv"), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"fluence/grid.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -308,7 +311,7 @@ def get_fluence(E0=100):
         t = next(r)
         u = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open(os.path.join(data_path,"fluence","".join([str(E_closest), ".csv"])), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"fluence","".join([str(E_closest), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -327,7 +330,7 @@ def get_cs(E0=100):
     """
     # NOTE: Data is given for E0>1keV. CS values below this level should be used with caution.
     # The default behaviour is to keep it constant
-    with open(os.path.join(data_path,"cs/grid.csv"), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"cs/grid.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -336,7 +339,7 @@ def get_cs(E0=100):
         t = next(r)
         k = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open(os.path.join(data_path,"cs/74.csv"), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"cs/74.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -350,7 +353,7 @@ def get_cs(E0=100):
 
 def get_mu(Z=74):
     """Returns a function representing mu(E) with mu in cm^-1 and E in keV for the given material"""
-    with open(os.path.join(data_path,"mu","".join([str(Z), ".csv"])), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"mu","".join([str(Z), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -362,7 +365,7 @@ def get_mu(Z=74):
 
 def get_csda():
     """Returns a function representing the CSDA range in cm in tungsten as a function of E0 in keV"""
-    with open(os.path.join(data_path,"csda/74.csv"), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"csda/74.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -381,7 +384,7 @@ def get_mu_csda(E0):
 
 def get_fluence_to_dose():
     """Returns a function representing the weighting factor which converts fluence to dose"""
-    with open(os.path.join(data_path,"fluence2dose/f2d.csv"), 'r', newline='') as csvfile:
+    with open(os.path.join(data_path,"fluence2dose/f2d.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)

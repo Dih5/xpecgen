@@ -1,2 +1,0 @@
-python xpecgenGUI.py
-pause
