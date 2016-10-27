@@ -123,7 +123,9 @@ class Spectrum:
         s = Spectrum()
         s.x = list(self.x)
         s.y = self.y[:]
-        s.discrete = self.discrete[:]
+        s.discrete = []
+        for a in self.discrete:
+            s.discrete.append(a[:])
         return s
 
     def get_continuous_function(self):
