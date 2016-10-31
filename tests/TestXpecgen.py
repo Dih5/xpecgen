@@ -18,9 +18,9 @@ class XpecgenTest(unittest.TestCase):
         """Test the Spectrum clone method"""
         s2 = s.clone()
         # Check same values
-        self.assertListEqual(list(s.x), list(s2.x))
-        self.assertListEqual(list(s.y), list(s2.y))
-        self.assertListEqual(list(s.discrete), list(s2.discrete))
+        self.assertEqual(list(s.x), list(s2.x))
+        self.assertEqual(list(s.y), list(s2.y))
+        self.assertEqual(list(s.discrete), list(s2.discrete))
         # Check alteration does not alter both instances
         s.x[0] = 10.0
         s.y[0] = 10.0
