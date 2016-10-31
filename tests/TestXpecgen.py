@@ -5,7 +5,7 @@
 TestXpecgen.py: Tests for  the `xpecgen` package.
 """
 
-from unittest import TestCase
+import unittest
 import math
 
 from xpecgen import xpecgen as xg
@@ -13,7 +13,7 @@ from xpecgen import xpecgen as xg
 s = xg.calculate_spectrum(100, 12, 3, 10, epsrel=0.5, monitor=None)
 
 
-class XpecgenTest(TestCase):
+class XpecgenTest(unittest.TestCase):
     def test_clone(self):
         """Test the Spectrum clone method"""
         s2 = s.clone()
