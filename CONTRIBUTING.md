@@ -14,7 +14,7 @@ In that case:
 * Write your code.
     - The less code you change, the better.
     - Try to follow the coding conventions in [PEP 8](https://www.python.org/dev/peps/pep-0008/).
-    - Docstrings **must** follow the [Google convention](http://google.github.io/styleguide/pyguide.html#Comments) (this only applies to docstrings, you may well ignore the rest).
+    - Docstrings **must** follow the [Google convention](http://google.github.io/styleguide/pyguide.html?showone=Comments#Comments) (this only applies to docstrings, you may well ignore the rest).
 * Check it works.
     - Add a test if suitable.
     - Check all tests pass.
