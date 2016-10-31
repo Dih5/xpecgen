@@ -10,7 +10,7 @@ python:
   - "nightly"
 cache: pip
 install:
-  - pip install matplotlib numpy scipy XlsxWriter
+  - pip install --only-binary=numpy,scipy matplotlib numpy scipy XlsxWriter
 
 script:
   - python -m unittest tests/TestXpecgen.py
