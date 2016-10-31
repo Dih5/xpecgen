@@ -122,9 +122,8 @@ This package is released under
 Releases of this package will be numbered using
 [Semantic Versioning guidelines](http://semver.org/).
 
-## Requests
-If you find any bugs or have a feature request you may create an [issue on GitHub](https://github.com/dih5/xpecgen/issues).
-You may also considering forking and sending a pull request if you are an experienced developer.
+## Contributing
+Check [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Model details
 To have a general overview of the model see [\[1\]](#Ref1).
