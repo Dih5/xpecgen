@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-"""xpecgen.py: A module to calculate x-ray spectra generated in tungsten anodes"""
+"""xpecgen.py: A module to calculate x-ray spectra generated in tungsten anodes."""
 
 from __future__ import print_function
 
@@ -113,8 +113,11 @@ def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, ma
         limit (int, optional): Upper bound on the number of cycles (>=3) for use with a sinusoidal weighting and an infinite end-point.
 
     Returns:
-        y (float): The resultant integral.
-        abserr (float): An estimate of the error.
+        (tuple): tuple containing:
+
+            y (float): The resultant integral.
+
+            abserr (float): An estimate of the error.
 
     """
     return integrate.quad(_infunc, a, b, (func, c, d, args, epsrel),
@@ -123,14 +126,13 @@ def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, ma
 
 def triangle(x, loc=0, size=0.5, area=1):
     """
-    Triangle window function evaluated a given point
-    The triangle window function centered in loc, of given size and area, evaluated in x.
+    The triangle window function centered in loc, of given size and area, evaluated at a point.
 
     Args:
         x: The point where the function is evaluated.
-        loc: The position of the peak
-        size: The total
-        area: The area below the function
+        loc: The position of the peak.
+        size: The total.
+        area: The area below the function.
 
     Returns:
         The value of the function.
@@ -153,10 +155,11 @@ class Spectrum:
         x (:obj:`numpy.ndarray`): x coordinates (energy) describing the continuum part of the spectrum.
         y (:obj:`numpy.ndarray`): y coordinates (pdf) describing the continuum part of the spectrum.
         discrete (List[List[float]]): discrete components of the spectrum, each of the form [x, num, rel_x] where:
+
             * x is the mean position of the peak.
             * num is the number of particles in the peak.
-            * relX is a characteristic distance where it should extend.
-            How that is represented depends on the window function used in the calculations.
+            * rel_x is a characteristic distance where it should extend. The exact meaning depends on the windows function.
+
     """
 
     def __init__(self):
@@ -172,7 +175,7 @@ class Spectrum:
         Return a new Spectrum object cloning itself
 
         Returns:
-            The new Spectrum.
+            :obj:`Spectrum`: The new Spectrum.
 
         """
         s = Spectrum()
@@ -185,7 +188,8 @@ class Spectrum:
 
     def get_continuous_function(self):
         """
-            Get a function representing the continuous part of the spectrum.
+        Get a function representing the continuous part of the spectrum.
+
         Returns:
             An interpolation function representing the continuous part of the spectrum.
 
@@ -198,12 +202,15 @@ class Spectrum:
         The mesh is chosen by extending x to include details of the discrete peaks.
 
         Args:
-            peak_shape: The window function used to calculate the peaks. See xpecgen.xpecgen.triangle for an example.
+            peak_shape: The window function used to calculate the peaks. See :obj:`triangle` for an example.
             num_discrete: Number of points that are added to mesh in each peak.
 
         Returns:
-            x2 (List[float]): The list of x coordinates (energy) in the whole spectrum.
-            y2 (List[float]): The list of y coordinates (density) in the whole spectrum.
+            (tuple): tuple containing:
+
+                x2 (List[float]): The list of x coordinates (energy) in the whole spectrum.
+
+                y2 (List[float]): The list of y coordinates (density) in the whole spectrum.
 
         """
         if peak_shape == None or self.discrete == []:
@@ -229,9 +236,9 @@ class Spectrum:
 
         Args:
             place: The class whose method plot is called to produce the plot (e.g., matplotlib.pyplot).
-            show_mesh (bool): whether to plot the points over the continuous line as circles.
-            prepare_format (bool): whether to include ticks and labels in the plot.
-            peak_shape: The window function used to plot the peaks. See xpecgen.xpecgen.triangle for an example.
+            show_mesh (bool): Whether to plot the points over the continuous line as circles.
+            prepare_format (bool): Whether to include ticks and labels in the plot.
+            peak_shape: The window function used to plot the peaks. See :obj:`triangle` for an example.
 
         """
         if prepare_format:
@@ -251,8 +258,8 @@ class Spectrum:
         Prepare the plot of the data and show it in matplotlib window.
 
         Args:
-            show_mesh (bool): whether to plot the points over the continuous line as circles.
-            block: whether the plot is blocking or non blocking.
+            show_mesh (bool): Whether to plot the points over the continuous line as circles.
+            block (bool): Whether the plot is blocking or non blocking.
 
         """
         plt.clf()
@@ -268,7 +275,7 @@ class Spectrum:
 
         Args:
             route (str): The route where the file will be saved.
-            peak_shape: The window function used to plot the peaks. See xpecgen.xpecgen.triangle for an example.
+            peak_shape: The window function used to plot the peaks. See :obj:`triangle` for an example.
             transpose (bool): True to write in two columns, False in two rows.
 
         """
@@ -287,7 +294,7 @@ class Spectrum:
 
         Args:
             route (str): The route where the file will be saved.
-            peak_shape: The window function used to plot the peaks. See xpecgen.xpecgen.triangle for an example.
+            peak_shape: The window function used to plot the peaks. See :obj:`triangle` for an example.
             markers (bool): Whether to use markers or a continuous line in the plot in the file.
 
         """
@@ -330,7 +337,8 @@ class Spectrum:
         Return the norm of the spectrum using a weighting function.
 
         Args:
-            weight: a function used as a weight to calculate the norm. Typical examples are:
+            weight: A function used as a weight to calculate the norm. Typical examples are:
+
                 * weight(E)=1 [Photon number]
                 * weight(E)=E [Energy]
                 * weight(E)=fluence2Dose(E) [Dose]
@@ -352,7 +360,8 @@ class Spectrum:
 
         Args:
             value (float): The norm of the modified spectrum in the given convention.
-            weight: a function used as a weight to calculate the norm. Typical examples are:
+            weight: A function used as a weight to calculate the norm. Typical examples are:
+
                 * weight(E)=1 [Photon number]
                 * weight(E)=E [Energy]
                 * weight(E)=fluence2Dose(E) [Dose]
@@ -369,8 +378,9 @@ class Spectrum:
         This method calculates the depth of a material needed for a certain dosimetric magnitude to decrease in a given factor.
 
         Args:
-            value (float): the factor the desired magnitude is decreased. Must be in [0, 1].
-            weight: a function used as a weight to calculate the norm. Typical examples are:
+            value (float): The factor the desired magnitude is decreased. Must be in [0, 1].
+            weight: A function used as a weight to calculate the norm. Typical examples are:
+
                 * weight(E)=1 [Photon number]
                 * weight(E)=E [Energy]
                 * weight(E)=fluence2Dose(E) [Dose]
@@ -379,6 +389,7 @@ class Spectrum:
 
         Returns:
             (float): The generalized hvl in cm.
+
         """
         # TODO: (?) Cut characteristic if below cutoff. However, such a high cutoff
         # would probably make no sense
@@ -412,8 +423,8 @@ class Spectrum:
 
     def attenuate(self, depth=1, mu=lambda x: 1):
         """
-        Attenuate the spectrum as if it passed thorough a given depth of material with attenuation described by mu.
-        Consistent units should be used.
+        Attenuate the spectrum as if it passed thorough a given depth of material with attenuation described by a given
+        attenuation coefficient. Consistent units should be used.
 
         Args:
             depth: The amount of material (typically in cm).
@@ -439,6 +450,7 @@ def get_fluence(E0=100):
 
     Returns:
         A function representing fluence(x,u) with x in CSDA units.
+
     """
     # List of available energies
     E0_str_list = list(map(lambda x: (os.path.split(x)[1]).split(".csv")[
@@ -476,6 +488,7 @@ def get_cs(E0=100):
 
     Returns:
         A function representing cross_section(e_g,u) in mb/keV, with e_g in keV.
+
     """
     # NOTE: Data is given for E0>1keV. CS values below this level should be used with caution.
     # The default behaviour is to keep it constant
@@ -509,6 +522,7 @@ def get_mu(Z=74):
 
     Returns:
         The attenuation coefficient mu(E) in cm^-1 as a function of the energy measured in keV.
+
     """
     with open(os.path.join(data_path,"mu","".join([str(Z), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
@@ -609,7 +623,7 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
         epsrel: The relative tolerance of the integral.
 
     Returns:
-
+        float: The value of the integral.
     """
     if e_g == e_0:
         return 0
@@ -622,11 +636,12 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
 def add_char_radiation(s, method="fraction_above_poly"):
     """
     Adds characteristic radiation to a calculated bremsstrahlung spectrum.
-    If a singular component exists in the spectrum, it is replaced.
+    If a discrete component already exists in the spectrum, it is replaced.
 
     Args:
-        s (:obj:`xpecgen.xpecgen.Spectrum`): the spectrum whose discrete component is recalculated.
+        s (:obj:`Spectrum`): The spectrum whose discrete component is recalculated.
         method (str): The method to use to calculate the discrete component. Available methods include:
+
             * 'fraction_above_linear': Use a linear relation between bremsstrahlung above the K-edge and peaks.
             * 'fraction_above_poly': Use polynomial fits between bremsstrahlung above the K-edge and peaks.
 
@@ -659,13 +674,13 @@ def add_char_radiation(s, method="fraction_above_poly"):
 
 def console_monitor(a, b):
     """
-    Simple monitor function which can be used with xpecgen.xpecgen.calculate_spectrum.
+    Simple monitor function which can be used with :obj:`calculate_spectrum`.
 
     Prints in stdout 'a/b'.
 
     Args:
-        a: an object representing the completed amount (e.g., a number...).
-        b: an object representing the total amount (... of a total).
+        a: An object representing the completed amount (e.g., a number representing a part...).
+        b: An object representing the total amount (... of a number representing a total).
 
 
     """
@@ -681,13 +696,13 @@ def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=conso
         E0 (float): Electron kinetic energy in keV
         theta (float): X-ray emission angle in degrees, the normal being at 90º
         eMin (float): Minimum kinetic energy to calculate in the spectrum in keV
-        numE (int): number of points to calculate in the spectrum
+        numE (int): Number of points to calculate in the spectrum
         phi (float): X-ray emission elevation angle in degrees.
         epsrel (float): The tolerance parameter used in numeric integration.
-        monitor: a function to be called after each iteration with arguments finished_count, total_count. See for example xpecgen.xpecgen.console_monitor.
+        monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
 
     Returns:
-        :obj:`Spectrum`: the calculated spectrum
+        :obj:`Spectrum`: The calculated spectrum
 
     """
     # Prepare spectrum
@@ -722,10 +737,10 @@ def plot_function(f, x_min, x_max, num=100):
     Plot a function in an independent matplotlib window.
 
     Args:
-        f: the function
-        x_min (float): minimum argument value
-        x_max (float): maximum argument value
-        num (int): number of points to calculate for the plot
+        f: The function to plot.
+        x_min (float): Minimum argument value.
+        x_max (float): Maximum argument value.
+        num (int): Number of points to calculate for the plot.
 
 
     """
