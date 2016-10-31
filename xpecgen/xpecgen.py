@@ -101,18 +101,20 @@ def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, ma
     A wrapper around numpy's dblquad to restrict it to a rectangular region and to pass arguments to the 'inner' integral.
 
     Args:
-        func:
-        a:
-        b:
-        c:
-        d:
-        args:
-        epsabs:
-        epsrel:
-        maxp1:
-        limit:
+        func: The integrand function f(y,x)
+        a (float): The lower bound of the second argument in the integrand function
+        b (float): The upper bound of the second argument in the integrand function
+        c (float): The lower bound of the first argument in the integrand function
+        d (float): The upper bound of the first argument in the integrand function
+        args (sequence, optional): extra arguments to pass to func
+        epsabs (float, optional): Absolute tolerance passed directly to the inner 1-D quadrature integration. Default is 1.49e-8
+        epsrel (float, optional): Relative tolerance of the inner 1-D integrals. Default is 1.49e-8.
+        maxp1 (float or int, optional): An upper bound on the number of Chebyshev moments.
+        limit (int, optional): Upper bound on the number of cycles (>=3) for use with a sinusoidal weighting and an infinite end-point.
 
     Returns:
+        y (float): The resultant integral.
+        abserr (float): An estimate of the error.
 
     """
     return integrate.quad(_infunc, a, b, (func, c, d, args, epsrel),
@@ -121,18 +123,19 @@ def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, ma
 
 def triangle(x, loc=0, size=0.5, area=1):
     """
+    Triangle window function evaluated a given point
     The triangle window function centered in loc, of given size and area, evaluated in x.
-    Mathematica code: If[Abs[(x - loc)/size] > 1, 0, 1 - Abs[(x - loc)/size]]/Abs[size*area]
 
     Args:
-        x:
-        loc:
-        size:
-        area:
+        x: The point where the function is evaluated.
+        loc: The position of the peak
+        size: The total
+        area: The area below the function
 
     Returns:
 
     """
+    # TODO: documentando aquí
     # t=abs((x-loc)/size)
     # return 0 if t>1 else (1-t)*abs(area/size)
     # Temporal variable code is disabled to avoid problems with plot_function.
