@@ -23,12 +23,18 @@
 
 
 # Mock the needed packages
-# http://blog.rtwilson.com/how-to-make-your-sphinx-documentation-compile-with-readthedocs-when-youre-using-numpy-and-scipy/
-import mock
+# http://docs.readthedocs.io/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
 import sys
-MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate', 'scipy.integrate', 'scipy.optimize', 'xlsxwriter']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+from unittest.mock import MagicMock
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 import sphinx_rtd_theme
 # -- General configuration ------------------------------------------------
