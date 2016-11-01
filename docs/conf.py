@@ -25,6 +25,7 @@
 # Mock the needed packages
 # http://blog.rtwilson.com/how-to-make-your-sphinx-documentation-compile-with-readthedocs-when-youre-using-numpy-and-scipy/
 import mock
+import sys
 MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate', 'scipy.integrate', 'scipy.optimize', 'xlsxwriter']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
