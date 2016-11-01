@@ -23,9 +23,10 @@ sys.path.insert(0, os.path.abspath('../'))
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
-# Mock the needed packages
+# Mock the needed packages on RTD
 # http://docs.readthedocs.io/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
 from unittest.mock import MagicMock
+
 
 class Mock(MagicMock):
     @classmethod
@@ -33,7 +34,8 @@ class Mock(MagicMock):
             return Mock()
 
 if on_rtd:
-    MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter','matplotlib.pyplot','matplotlib.backends','matplotlib.backends.backend_tkagg']
+    MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter','matplotlib.pyplot','matplotlib.backends',
+                    'matplotlib.backends.backend_tkagg','matplotlib.figure']
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
