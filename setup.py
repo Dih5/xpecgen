@@ -9,13 +9,21 @@ https://github.com/pypa/sampleproject
 from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
-from os import path
+from os import path, environ
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
+
+# Dependencies are mocked on RTD
+on_rtd = environ.get('READTHEDOCS') == 'True'
+
+if on_rtd:
+    require_list = []
+else:
+    require_list = ['matplotlib', 'numpy', 'scipy', 'XlsxWriter', 'future']
 
 
 setup(
@@ -81,7 +89,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['matplotlib', 'numpy', 'scipy', 'XlsxWriter', 'future'],
+    install_requires=require_list,
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
