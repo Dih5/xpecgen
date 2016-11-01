@@ -33,7 +33,7 @@ class Mock(MagicMock):
             return Mock()
 
 if on_rtd:
-    MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter']
+    MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter','matplotlib.pyplot','matplotlib.backends','matplotlib.backends.backend_tkagg ']
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
