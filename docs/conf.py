@@ -17,14 +17,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../'))
 
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 # Mock the needed packages
 # http://docs.readthedocs.io/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
-import sys
 from unittest.mock import MagicMock
 
 class Mock(MagicMock):
@@ -32,8 +32,9 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
             return Mock()
 
-MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+if on_rtd:
+    MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter']
+    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
 import sphinx_rtd_theme
