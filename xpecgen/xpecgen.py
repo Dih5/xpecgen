@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-"""xpecgen.py: A module to calculate x-ray spectra generated in tungsten anodes"""
+"""xpecgen.py: A module to calculate x-ray spectra generated in tungsten anodes."""
 
 from __future__ import print_function
 
@@ -63,11 +63,20 @@ import xlsxwriter
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"data")
 
 
-
 #--------------------General purpose functions-------------------------#
 
 def logInterp1d(xx, yy, kind='linear'):
-    """Log-Log interpolation"""
+    """
+    Perform interpolation in log-log scale.
+
+    Args:
+        xx (List[float]): x-coordinates of the points.
+        yy (List[float]): y-coordinates of the points.
+        kind (str or int, optional): The kind of interpolation in the log-log domain. This is passed to scipy.interpolate.interp1d.
+
+    Returns:
+        A function whose call method uses interpolation in log-log scale to find the value at a given point.
+    """
     logx = np.log10(xx)
     logy = np.log10(yy)
     # No big difference in efficience was found when replacing interp1d by
@@ -77,7 +86,7 @@ def logInterp1d(xx, yy, kind='linear'):
     return logInterp
 
 
-# This custom implemenation of dblquad is based in the one in numpy
+# This custom implementation of dblquad is based in the one in numpy
 #(Cf. https://github.com/scipy/scipy/blob/v0.16.1/scipy/integrate/quadpack.py#L449 )
 # It was modified to work only in rectangular regions (no g(x) nor h(x))
 # to set the inner integral epsrel
@@ -88,14 +97,46 @@ def _infunc(x, func, c, d, more_args, epsrel):
 
 
 def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, maxp1=50, limit=50):
+    """
+    A wrapper around numpy's dblquad to restrict it to a rectangular region and to pass arguments to the 'inner' integral.
+
+    Args:
+        func: The integrand function f(y,x).
+        a (float): The lower bound of the second argument in the integrand function.
+        b (float): The upper bound of the second argument in the integrand function.
+        c (float): The lower bound of the first argument in the integrand function.
+        d (float): The upper bound of the first argument in the integrand function.
+        args (sequence, optional): extra arguments to pass to func.
+        epsabs (float, optional): Absolute tolerance passed directly to the inner 1-D quadrature integration. Default is 1.49e-8.
+        epsrel (float, optional): Relative tolerance of the inner 1-D integrals. Default is 1.49e-8.
+        maxp1 (float or int, optional): An upper bound on the number of Chebyshev moments.
+        limit (int, optional): Upper bound on the number of cycles (>=3) for use with a sinusoidal weighting and an infinite end-point.
+
+    Returns:
+        (tuple): tuple containing:
+
+            y (float): The resultant integral.
+
+            abserr (float): An estimate of the error.
+
+    """
     return integrate.quad(_infunc, a, b, (func, c, d, args, epsrel),
                           epsabs=epsabs, epsrel=epsrel, maxp1=maxp1, limit=2000)
 
 
 def triangle(x, loc=0, size=0.5, area=1):
     """
-    The triangle window function centered in loc, of given size and area, evaluated in x
-    Mathematica code: If[Abs[(x - loc)/size] > 1, 0, 1 - Abs[(x - loc)/size]]/Abs[size*area]
+    The triangle window function centered in loc, of given size and area, evaluated at a point.
+
+    Args:
+        x: The point where the function is evaluated.
+        loc: The position of the peak.
+        size: The total.
+        area: The area below the function.
+
+    Returns:
+        The value of the function.
+
     """
     # t=abs((x-loc)/size)
     # return 0 if t>1 else (1-t)*abs(area/size)
@@ -107,19 +148,36 @@ def triangle(x, loc=0, size=0.5, area=1):
 
 
 class Spectrum:
-    """Set of 2D points and discrete components representing a spectrum"""
+    """
+    Set of 2D points and discrete components representing a spectrum.
+
+    Attributes:
+        x (:obj:`numpy.ndarray`): x coordinates (energy) describing the continuum part of the spectrum.
+        y (:obj:`numpy.ndarray`): y coordinates (pdf) describing the continuum part of the spectrum.
+        discrete (List[List[float]]): discrete components of the spectrum, each of the form [x, num, rel_x] where:
+
+            * x is the mean position of the peak.
+            * num is the number of particles in the peak.
+            * rel_x is a characteristic distance where it should extend. The exact meaning depends on the windows function.
+
+    """
 
     def __init__(self):
-        self.x = []  # x coordinates (energy) describing the continuum
-        self.y = []  # y coordiantes (pdf) describing the continuum
-        # Singular components of the spectrum, each list of the form [x, num,
-        # relX]
+        """
+        Create an empty spectrum.
+        """
+        self.x = []
+        self.y = []
         self.discrete = []
-        # num is the area in the peak, x its center and relX a characteristic distance where it should extend
-        # how that is represented depends on the window function used
 
     def clone(self):
-        """Return a new Spectrum object cloning self"""
+        """
+        Return a new Spectrum object cloning itself
+
+        Returns:
+            :obj:`Spectrum`: The new Spectrum.
+
+        """
         s = Spectrum()
         s.x = list(self.x)
         s.y = self.y[:]
@@ -129,13 +187,31 @@ class Spectrum:
         return s
 
     def get_continuous_function(self):
-        """Get an interpolation function representing the continuous part of the spectrum"""
+        """
+        Get a function representing the continuous part of the spectrum.
+
+        Returns:
+            An interpolation function representing the continuous part of the spectrum.
+
+        """
         return interpolate.interp1d(self.x, self.y, bounds_error=False, fill_value=0)
 
     def get_points(self, peak_shape=triangle, num_discrete=10):
-        """Returns two lists of coordinates x y representing the whole spectrum, both the continuos and discrete component
-            The mesh is chosen by extending self.x to include details of the discrete peaks num_discrete points are added for each peak.
-            peak_shape is a window function used to calculate the peaks. See xpecgen.triangle for a prototypical example.
+        """
+        Returns two lists of coordinates x y representing the whole spectrum, both the continuous and discrete components.
+        The mesh is chosen by extending x to include details of the discrete peaks.
+
+        Args:
+            peak_shape: The window function used to calculate the peaks. See :obj:`triangle` for an example.
+            num_discrete: Number of points that are added to mesh in each peak.
+
+        Returns:
+            (tuple): tuple containing:
+
+                x2 (List[float]): The list of x coordinates (energy) in the whole spectrum.
+
+                y2 (List[float]): The list of y coordinates (density) in the whole spectrum.
+
         """
         if peak_shape == None or self.discrete == []:
             return self.x[:], self.y[:]
@@ -155,7 +231,16 @@ class Spectrum:
         return x2, y2
 
     def get_plot(self, place, show_mesh=True, prepare_format=True, peak_shape=triangle):
-        """Prepare a plot of the data in the given place"""
+        """
+        Prepare a plot of the data in the given place
+
+        Args:
+            place: The class whose method plot is called to produce the plot (e.g., matplotlib.pyplot).
+            show_mesh (bool): Whether to plot the points over the continuous line as circles.
+            prepare_format (bool): Whether to include ticks and labels in the plot.
+            peak_shape: The window function used to plot the peaks. See :obj:`triangle` for an example.
+
+        """
         if prepare_format:
             place.tick_params(axis='both', which='major', labelsize=10)
             place.tick_params(axis='both', which='minor', labelsize=8)
@@ -167,19 +252,33 @@ class Spectrum:
             place.plot(self.x, self.y, 'bo', x2, y2, 'b-')
         else:
             place.plot(x2, y2, 'b-')
-        return
 
-    def show_plot(self, joined=True, block=True):
-        """Prepare the plot of the data and show it in mutplotlib window """
+    def show_plot(self, show_mesh=True, block=True):
+        """
+        Prepare the plot of the data and show it in matplotlib window.
+
+        Args:
+            show_mesh (bool): Whether to plot the points over the continuous line as circles.
+            block (bool): Whether the plot is blocking or non blocking.
+
+        """
         plt.clf()
-        self.get_plot(plt, prepare_format=False)
+        self.get_plot(plt, show_mesh=show_mesh, prepare_format=False)
         plt.xlabel("E")
         plt.ylabel("f(E)")
         plt.gcf().canvas.set_window_title("".join(('xpecgen v', __version__)))
         plt.show(block=block)
 
     def export_csv(self, route="a.csv", peak_shape=triangle, transpose=False):
-        """Export the data to a csv file (comma-separated values)"""
+        """
+        Export the data to a csv file (comma-separated values).
+
+        Args:
+            route (str): The route where the file will be saved.
+            peak_shape: The window function used to plot the peaks. See :obj:`triangle` for an example.
+            transpose (bool): True to write in two columns, False in two rows.
+
+        """
         x2, y2 = self.get_points(peak_shape=peak_shape)
         with open(route, 'w') as csvfile:
             w = csv.writer(csvfile, dialect='excel')
@@ -190,7 +289,15 @@ class Spectrum:
                 w.writerow(y2)
 
     def export_xlsx(self, route="a.xlsx", peak_shape=triangle, markers=False):
-        """Export the data to a xlsx file (Excel format)"""
+        """
+        Export the data to a xlsx file (Excel format).
+
+        Args:
+            route (str): The route where the file will be saved.
+            peak_shape: The window function used to plot the peaks. See :obj:`triangle` for an example.
+            markers (bool): Whether to use markers or a continuous line in the plot in the file.
+
+        """
         x2, y2 = self.get_points(peak_shape=peak_shape)
 
         workbook = xlsxwriter.Workbook(route)
@@ -226,10 +333,19 @@ class Spectrum:
         workbook.close()
 
     def get_norm(self, weight=None):
-        """Return the norm of the spectrum using a weighting function
-            weight(E)=1              ->Photon number (Default)
-            weight(E)=E              ->Energy
-            weight(E)=fluence2Dose(E)->Dose
+        """
+        Return the norm of the spectrum using a weighting function.
+
+        Args:
+            weight: A function used as a weight to calculate the norm. Typical examples are:
+
+                * weight(E)=1 [Photon number]
+                * weight(E)=E [Energy]
+                * weight(E)=fluence2Dose(E) [Dose]
+
+        Returns:
+            (float): The calculated norm.
+
         """
         if weight == None:
             w = lambda x: 1
@@ -239,20 +355,41 @@ class Spectrum:
         return integrate.simps(y2, x=self.x) + sum([w(a[0]) * a[1] for a in self.discrete])
 
     def set_norm(self, value=1, weight=None):
-        """Set the norm of the spectrum to the given value using a weighting function
-            w(E)=1              ->Photon number (Default)
-            w(E)=E              ->Energy
-            w(E)=fluence2Dose(E)->Dose
+        """
+        Set the norm of the spectrum using a weighting function.
+
+        Args:
+            value (float): The norm of the modified spectrum in the given convention.
+            weight: A function used as a weight to calculate the norm. Typical examples are:
+
+                * weight(E)=1 [Photon number]
+                * weight(E)=E [Energy]
+                * weight(E)=fluence2Dose(E) [Dose]
+
         """
         norm = self.get_norm(weight=weight) / value
         self.y = [a / norm for a in self.y]
         self.discrete = [[a[0], a[1] / norm, a[2]] for a in self.discrete]
 
     def hvl(self, value=0.5, weight=lambda x: 1, mu=lambda x: 1, energy_min=0):
-        """Calculate a generalized HVL
-            This method calculates the depth of a material with attenuation described by mu
-            which is needed for the weighted integral of the spectrum to decay in a factor
-            given by value (should be in (0,1))
+        """
+        Calculate a generalized half-value-layer.
+
+        This method calculates the depth of a material needed for a certain dosimetric magnitude to decrease in a given factor.
+
+        Args:
+            value (float): The factor the desired magnitude is decreased. Must be in [0, 1].
+            weight: A function used as a weight to calculate the norm. Typical examples are:
+
+                * weight(E)=1 [Photon number]
+                * weight(E)=E [Energy]
+                * weight(E)=fluence2Dose(E) [Dose]
+            mu: The energy absorption coefficient as a function of energy.
+            energy_min (float): A low-energy cutoff to use in the calculation.
+
+        Returns:
+            (float): The generalized hvl in cm.
+
         """
         # TODO: (?) Cut characteristic if below cutoff. However, such a high cutoff
         # would probably make no sense
@@ -285,9 +422,17 @@ class Spectrum:
             return optimize.brentq(f, a, a * 10.0)
 
     def attenuate(self, depth=1, mu=lambda x: 1):
-        """Attenuate the spectra as if passed thorough a given depth of material with attenuation described by mu
-            Use consistent units in depth and mu.
         """
+        Attenuate the spectrum as if it passed thorough a given depth of material with attenuation described by a given
+        attenuation coefficient. Consistent units should be used.
+
+        Args:
+            depth: The amount of material (typically in cm).
+            mu: The energy-dependent absorption coefficient (typically in cm^-1).
+
+
+        """
+
         self.y = list(
             map(lambda x, y: y * math.exp(-mu(x) * depth), self.x, self.y))
         self.discrete = list(
@@ -297,7 +442,16 @@ class Spectrum:
 
 
 def get_fluence(E0=100):
-    """Returns a function representing fluence(x,u) with x in CSDA units"""
+    """
+    Returns a function representing the electron fluence with the distance in CSDA units.
+
+    Args:
+        E0: The kinetic energy whose CSDA range is used to scale the distances.
+
+    Returns:
+        A function representing fluence(x,u) with x in CSDA units.
+
+    """
     # List of available energies
     E0_str_list = list(map(lambda x: (os.path.split(x)[1]).split(".csv")[
                        0], glob(os.path.join(data_path, "fluence", "*.csv"))))
@@ -326,9 +480,15 @@ def get_fluence(E0=100):
 
 
 def get_cs(E0=100):
-    """Returns a function representing cross_section(e_g,u) with e_g in keV
-    Physical dimessions are mb/keV
-    Note E0 is being used to scale u=e_e/E0
+    """
+    Returns a function representing the scaled bremsstrahlung cross_section.
+
+    Args:
+        E0 (float): The electron kinetic energy, used to scale u=e_e/E0.
+
+    Returns:
+        A function representing cross_section(e_g,u) in mb/keV, with e_g in keV.
+
     """
     # NOTE: Data is given for E0>1keV. CS values below this level should be used with caution.
     # The default behaviour is to keep it constant
@@ -354,7 +514,16 @@ def get_cs(E0=100):
 
 
 def get_mu(Z=74):
-    """Returns a function representing mu(E) with mu in cm^-1 and E in keV for the given material"""
+    """
+    Returns a function representing an energy-dependent attenuation coefficient.
+
+    Args:
+        Z (int or str): The identifier of the material in the data folder, typically the atomic number.
+
+    Returns:
+        The attenuation coefficient mu(E) in cm^-1 as a function of the energy measured in keV.
+
+    """
     with open(os.path.join(data_path,"mu","".join([str(Z), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
@@ -366,7 +535,13 @@ def get_mu(Z=74):
 
 
 def get_csda():
-    """Returns a function representing the CSDA range in cm in tungsten as a function of E0 in keV"""
+    """
+    Returns a function representing the CSDA range in tungsten.
+
+    Returns:
+        The CSDA range in cm in tungsten as a function of the electron kinetic energy in keV.
+
+    """
     with open(os.path.join(data_path,"csda/74.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
@@ -378,14 +553,28 @@ def get_csda():
 
 
 def get_mu_csda(E0):
-    """Returns a function representing mu(E) in tungsten with mu in CSDA units"""
+    """
+    Returns a function representing the CSDA-scaled energy-dependent attenuation coefficient in tungsten.
+
+    Args:
+        E0 (float): The electron initial kinetic energy.
+
+    Returns:
+        The attenuation coefficient mu(E) in CSDA units as a function of the energy measured in keV.
+    """
     mu = get_mu(74)
     csda = get_csda()(E0)
     return lambda E: mu(E) * csda
 
 
 def get_fluence_to_dose():
-    """Returns a function representing the weighting factor which converts fluence to dose"""
+    """
+    Returns a function representing the weighting factor which converts fluence to dose.
+
+    Returns:
+        A function representing the weighting factor which converts fluence to dose in Gy * cm^2.
+
+    """
     with open(os.path.join(data_path,"fluence2dose/f2d.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
@@ -397,9 +586,20 @@ def get_fluence_to_dose():
 
 
 def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
-    """Returns the attenuated source function for given parameters
-    Constant factors are excluded
-    s(u,x)
+    """
+    Returns the attenuated source function for the given parameters. An E_0-dependent factor is excluded.
+
+    Args:
+        fluence: The function representing the fluence.
+        cs: The function representing the bremsstrahlung cross-section.
+        mu: The function representing the attenuation coefficient.
+        theta (float): The emission angle in degrees, the anode's normal being at 90º.
+        eg (float): The emitted photon energy in keV.
+        phi (float): The elevation angle in degrees, the anode's normal being at 12º.
+
+    Returns:
+        The attenuated source function s(u,x).
+
     """
     factor = -mu(eg) / math.sin(math.radians(theta)) / \
         math.cos(math.radians(phi))
@@ -407,8 +607,24 @@ def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
 
 
 def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max=0.6, epsrel=0.1):
-    """Find the integral of the source functions for a given photon energy eg
-    Constant factors are excluded"""
+    """
+    Find the integral of the attenuated source function. An E_0-dependent factor is excluded.
+
+    Args:
+        fluence: The function representing the fluence.
+        cs: The function representing the bremsstrahlung cross-section.
+        mu: The function representing the attenuation coefficient.
+        theta (float): The emission angle in degrees, the anode's normal being at 90º.
+        e_g: (float): The emitted photon energy in keV.
+        e_0 (float): The electron initial kinetic energy.
+        phi (float): The elevation angle in degrees, the anode's normal being at 12º.
+        x_min: The lower-bound of the integral in depth, scaled by the CSDA range.
+        x_max: The upper-bound of the integral in depth, scaled by the CSDA range.
+        epsrel: The relative tolerance of the integral.
+
+    Returns:
+        float: The value of the integral.
+    """
     if e_g == e_0:
         return 0
     f = get_source_function(fluence, cs, mu, theta, e_g, phi=phi)
@@ -418,11 +634,17 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
 
 
 def add_char_radiation(s, method="fraction_above_poly"):
-    """Adds characteristic radiation to a calculated bremsstrahlung spectrum
-       if a singular component exists in the spectrum, it is replaced.
-       Available methods:
-       - fraction_above_linear: Use a linear relation between bremsstrahlung above the K-edge and peaks
-       - fraction_above_poly: Use polynomial fits between bremsstrahlung above the K-edge and peaks
+    """
+    Adds characteristic radiation to a calculated bremsstrahlung spectrum.
+    If a discrete component already exists in the spectrum, it is replaced.
+
+    Args:
+        s (:obj:`Spectrum`): The spectrum whose discrete component is recalculated.
+        method (str): The method to use to calculate the discrete component. Available methods include:
+
+            * 'fraction_above_linear': Use a linear relation between bremsstrahlung above the K-edge and peaks.
+            * 'fraction_above_poly': Use polynomial fits between bremsstrahlung above the K-edge and peaks.
+
     """
     s.discrete = []
     if s.x[-1] < 69.51:  # If under k edge, no char radiation
@@ -451,15 +673,37 @@ def add_char_radiation(s, method="fraction_above_poly"):
 
 
 def console_monitor(a, b):
-    """Simple monitor function which can be used with calculate_spectrum"""
+    """
+    Simple monitor function which can be used with :obj:`calculate_spectrum`.
+
+    Prints in stdout 'a/b'.
+
+    Args:
+        a: An object representing the completed amount (e.g., a number representing a part...).
+        b: An object representing the total amount (... of a number representing a total).
+
+
+    """
     print("Calculation: ", a, "/", b)
 
 
 def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=console_monitor):
-    """Calculates the x-ray spectrum for given parameters.
-       monitor defines a function to be called after each iteration,
-       with arguments finished_count, total_count
-       Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
+    """
+    Calculates the x-ray spectrum for given parameters.
+    Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
+
+    Args:
+        E0 (float): Electron kinetic energy in keV
+        theta (float): X-ray emission angle in degrees, the normal being at 90º
+        eMin (float): Minimum kinetic energy to calculate in the spectrum in keV
+        numE (int): Number of points to calculate in the spectrum
+        phi (float): X-ray emission elevation angle in degrees.
+        epsrel (float): The tolerance parameter used in numeric integration.
+        monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
+
+    Returns:
+        :obj:`Spectrum`: The calculated spectrum
+
     """
     # Prepare spectrum
     s = Spectrum()
@@ -489,7 +733,17 @@ def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=conso
 
 
 def plot_function(f, x_min, x_max, num=100):
-    """Plot a function in independent matplotlib window"""
+    """
+    Plot a function in an independent matplotlib window.
+
+    Args:
+        f: The function to plot.
+        x_min (float): Minimum argument value.
+        x_max (float): Maximum argument value.
+        num (int): Number of points to calculate for the plot.
+
+
+    """
     x = np.linspace(x_min, x_max, num=num, endpoint=True)
     # Instead of y=list(map(f,x)) we vectorize the function to deal with functions returning numpy arrays
     # FIXME: This can lead to problems if local variables are used in the given function!!!

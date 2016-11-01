@@ -70,12 +70,20 @@ from . import xpecgen as xg
 
 class CreateToolTip(object):
     """
-    create a tooltip for a given widget
+    A tooltip for a given widget.
     """
     # Based on the content from this post:
     # http://stackoverflow.com/questions/3221956/what-is-the-simplest-way-to-make-tooltips-in-tkinter
 
     def __init__(self, widget, text, color="#ffe14c"):
+        """
+        Create a tooltip for an existent widget.
+
+        Args:
+            widget: The widget the tooltip is applied to.
+            text (str): The text of the tooltip.
+            color: The color of the tooltip.
+        """
         self.waittime = 500  # miliseconds
         self.wraplength = 180  # pixels
         self.widget = widget
@@ -127,10 +135,22 @@ class CreateToolTip(object):
 
 
 class ParBox():
-    """Add a parameter entry with labels preceding and succeeding it and a tooltip"""
+    """A parameter entry with labels preceding and succeeding it and an optional tooltip"""
 
     def __init__(self, master=None, textvariable=0, lblText="", unitsTxt="", helpTxt="", row=0, read_only=False):
+        """
+        Create the parameter box.
 
+        Args:
+            master: the master widget.
+            textvariable (:obj:`tkinter.Variable`): The variable associated with the parameter.
+            lblText (str): The text preceding the text entry.
+            unitsTxt (str): The text succeeding the text entry, typically the units.
+            helpTxt (str): The help text to show in the tooltip. If "", no tooltip is shown.
+            row (int): The row where the widgets are set in the grid.
+            read_only (bool): Whether the entry is read_only.
+
+        """
         self.lbl = Label(master, text=lblText)
         self.lbl.grid(row=row, column=0, sticky=W)
 
@@ -149,8 +169,16 @@ class ParBox():
 
 
 class XpecgenGUI(Notebook):
+    """Tk-based GUI for the xpecgen package."""
 
     def __init__(self, master=None):
+        """
+        Create the GUI.
+
+        Args:
+            master: the tk master of the GUI.
+
+        """
         Notebook.__init__(self, master)
         Grid.rowconfigure(master, 0, weight=1)
         Grid.columnconfigure(master, 0, weight=1)
@@ -174,10 +202,11 @@ class XpecgenGUI(Notebook):
         
 
     def history_poll(self):
-        '''Polling method to update changes in spectrum list
-           Tk manual advised for polling instead of binding all methods
-           that are able to change a listbox
-        '''
+        """
+        Polling method to update changes in spectrum list.
+
+        """
+        #Note the Tk manual advised for polling instead of binding all methods that are able to change a listbox
         try:
             now = self.lstHistory.curselection()[0]
             if now != self.active_spec:
@@ -331,13 +360,14 @@ class XpecgenGUI(Notebook):
         material_list=list(map(lambda x: (os.path.split(x)[1]).split(
             ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
 
-
         def human_order_key(text):
-            '''
-            key function to sort in human order. Based in:
-            http://nedbatchelder.com/blog/200712/human_sorting.html
-            '''
-            return [ int(c) if c.isdigit() else c for c in re.split('(\d+)', text) ]
+            """
+            Key function to sort in human order.
+
+            """
+            # This is based in http://nedbatchelder.com/blog/200712/human_sorting.html
+            return [int(c) if c.isdigit() else c for c in re.split('(\d+)', text)]
+
         material_list.sort(key=human_order_key)
         self.cmbAttenMaterial["values"] = material_list
         self.cmbAttenMaterial.grid(row=0, column=1, sticky=E + W)
@@ -349,7 +379,7 @@ class XpecgenGUI(Notebook):
         Grid.columnconfigure(self.frmOperAtten, 0, weight=0)
         Grid.columnconfigure(self.frmOperAtten, 1, weight=1)
         Grid.columnconfigure(self.frmOperAtten, 2, weight=0)
-        
+
         #--Normalize
         self.frmOperNorm = LabelFrame(self.frmOper, text="Normalize")
         self.frmOperNorm.grid(row=1, column=0, sticky=N + S + E + W)
@@ -397,7 +427,7 @@ class XpecgenGUI(Notebook):
             #self.cmdShowPlot["command"] = self.update_plot
             # self.cmdShowPlot.grid(row=0,column=0)
             print("WARNING: Matplotlib couldn't be embedded in TkAgg.\nUsing independent window instead", file=sys.stderr)
-            
+
         #--Spectral parameters frame
         self.frmSpectralParameters = LabelFrame(self.frmAnal, text="Spectral parameters")
         self.frmSpectralParameters.grid(row=2, column=0, sticky= S + E + W)
@@ -408,7 +438,7 @@ class XpecgenGUI(Notebook):
         self.ParNorm = ParBox(self.frmSpectralParameters, self.number, lblText="Photon number", unitsTxt="", row=4, read_only=True, helpTxt="Number of photons in the spectrum.")
         self.ParEnergy = ParBox(self.frmSpectralParameters, self.energy, lblText="Energy", unitsTxt="keV", row=5, read_only=True, helpTxt="Total energy in the spectrum.")
         self.ParDose = ParBox(self.frmSpectralParameters, self.dose, lblText="Dose", unitsTxt="mGy", row=6, read_only=True, helpTxt="Dose produced in air by the spectrum, assuming it is describing the differential fluence in particles/keV/cm^2.")
-       
+
 
         Grid.columnconfigure(self.frmAnal, 0, weight=1)
         if self.matplotlib_embedded:
@@ -419,16 +449,20 @@ class XpecgenGUI(Notebook):
         Grid.rowconfigure(self.frmAnal, 1, weight=1)
         
     def enable_analyze_buttons(self):
-        """Enable widgets requiring a calculated spectrum to work"""
+        """
+        Enable widgets requiring a calculated spectrum to work.
+
+        """
         self.cmdCleanHistory["state"] = "normal"
         self.cmdExport["state"] = "normal"
         self.cmdAtten["state"] = "normal"
         self.cmdNorm["state"] = "normal"
-        pass
 
     def update_plot(self):
-        """Update the canvas after plotting something
-           If matplotlib is not embedded, show it in an independent window
+        """
+        Update the canvas after plotting something.
+        If matplotlib is not embedded, show it in an independent window.
+
         """
         if self.matplotlib_embedded:
             self.subfig.clear()
@@ -444,7 +478,10 @@ class XpecgenGUI(Notebook):
         self.update_param()
         
     def update_param(self):
-        """Update parameters calculated from the active spectrum"""
+        """
+        Update parameters calculated from the active spectrum.
+
+        """
         hvlAl=self.spectra[self.active_spec].hvl(0.5,self.fluence_to_dose,self.mu_Al)
         qvlAl=self.spectra[self.active_spec].hvl(0.25,self.fluence_to_dose,self.mu_Al)
 
@@ -462,11 +499,22 @@ class XpecgenGUI(Notebook):
         self.dose.set('%s' % float('%.3g' % (self.spectra[self.active_spec].get_norm(self.fluence_to_dose))))
 
     def monitor_bar(self, a, b):
-        """Update the progress bar"""
+        """
+        Update the progress bar.
+
+        Args:
+            a (int): The number of items already calculated.
+            b (int): The total number of items to calculate.
+
+        """
         self.barProgress["value"] = a
         self.barProgress["maximum"] = b
 
     def clean_history(self):
+        """
+        Clean the spectra history.
+
+        """
         try:
             now = int(self.lstHistory.curselection()[0])
             if now == len(self.spectra) - 1:  # No need to slice
@@ -478,6 +526,10 @@ class XpecgenGUI(Notebook):
             pass
         
     def export(self):
+        """
+        Export the selected spectrum in xlsx format, showing a file dialog to choose the route.
+
+        """
         if self.lstHistory.curselection()==():
             selection=-1
         else:
@@ -499,11 +551,13 @@ class XpecgenGUI(Notebook):
             self.spectra[selection].export_csv(filename)
         else:
             messagebox.showerror("Error", "Unknown file extension: "+ext+"\nUse the file types from the dialog to export.")
-        pass
 
     def calculate(self):
-        """Calculates a new spectrum"""
-        def callback(): #Carry calculation in a different thread to avoid blocking
+        """
+        Calculates a new spectrum using the parameters in the GUI.
+
+        """
+        def callback(): # Carry the calculation in a different thread to avoid blocking
             s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(
             ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=self.monitor_bar)
             self.spectra = [s]
@@ -532,8 +586,10 @@ class XpecgenGUI(Notebook):
         self.after(250, self.wait_for_calculation)
 
     def wait_for_calculation(self):
-        '''Polling method to wait for the calculation thread to finish
-        '''
+        """
+        Polling method to wait for the calculation thread to finish.
+
+        """
         if self.queue_calculation.full():
             self.cmdCalculate["state"]="normal"
             self.enable_analyze_buttons()
@@ -545,7 +601,10 @@ class XpecgenGUI(Notebook):
             self.after(250, self.wait_for_calculation)
 
     def attenuate(self):
-        """Attenuate the active spectrum"""
+        """
+        Attenuate the active spectrum according to the parameters in the GUI.
+
+        """
         s2 = self.spectra[-1].clone()
         s2.attenuate(self.AttenThick.get(),
                      xg.get_mu(self.AttenMaterial.get()))
@@ -558,7 +617,10 @@ class XpecgenGUI(Notebook):
         pass
         
     def normalize(self):
-        """Normalize the active spectrum"""
+        """
+        Normalize the active spectrum according to the parameters in the GUI.
+
+        """
         value=self.NormValue.get()
         crit = self.NormCriterion.get()
         if value<=0:
@@ -582,7 +644,12 @@ class XpecgenGUI(Notebook):
         self.update_plot()
         pass
 
+
 def main():
+    """
+    Start an instance of the GUI.
+
+    """
     root = Tk()
     app = XpecgenGUI(master=root)
     app.mainloop()
