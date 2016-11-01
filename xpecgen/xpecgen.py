@@ -5,7 +5,7 @@
 
 from __future__ import print_function
 
-#----------------------------------------------------------------------#
+# ----------------------------------------------------------------------#
 #                               ,
 #                              ▓█      ██
 #                             ▄█▌      ╙█▌
@@ -19,7 +19,7 @@ from __future__ import print_function
 #  -██████▄▄,,   ╓     ╙████▄▄▄█▄ⁿ⌐   ═▄█▄▄,████▀     ▄   ,,╓▄▄█████W
 #        `╙▀▀██, ╓ ╙╗.'""▀█▌▀▀█████████████▀▀██T"*.▄▀,, ,▄█▀▀▀Γ'
 #         ╓▓██╙██▀▄▄ "▓▄ ██W  ██████▀█████,  ██▌▄▄M ▄▄█▀█▀▄█▓▄
-#¢█▄,     ██████▄,[▐█Γ ⌠███████▀███▌║███████████░ "█▌[,▄█▓████     ,▄▓▌
+# ¢█▄,     ██████▄,[▐█Γ ⌠███████▀███▌║███████████░ "█▌[,▄█▓████     ,▄▓▌
 # ╙▀███▄▄,╙█▀▄║▀▀▀███▌ `███████████▓████████████D ▐███▀▀▀▀▄▀█▀,▄▄▓██▀▀
 #    Γ T▀▀█▀▀▀█▄╗▌▄▌▀, ▓███▀▀██████████████▀▀████ ┌▀▀▄▄▌Φ█▀▀▀██▀Γ T
 #           .▄ "%,,▓▄▄▓█████████████████▓█████████▄▄█╓,/^,,=
@@ -38,13 +38,14 @@ from __future__ import print_function
 #                  ,▄██H                         ██▄▄
 #                 ▓█▀                              ▀██⌐
 #
-#----------------------------------------------------------------------#
+# ----------------------------------------------------------------------#
 __author__ = 'Dih5'
 __version__ = "1.0.1"
-#----------------------------------------------------------------------#
+# ----------------------------------------------------------------------#
 
 import math
 import matplotlib.pyplot as plt
+
 plt.ion()
 import numpy as np
 from scipy import interpolate, integrate, optimize
@@ -59,11 +60,10 @@ import warnings
 import csv
 import xlsxwriter
 
+data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"data")
 
-
-#--------------------General purpose functions-------------------------#
+# --------------------General purpose functions-------------------------#
 
 def logInterp1d(xx, yy, kind='linear'):
     """
@@ -79,7 +79,7 @@ def logInterp1d(xx, yy, kind='linear'):
     """
     logx = np.log10(xx)
     logy = np.log10(yy)
-    # No big difference in efficience was found when replacing interp1d by
+    # No big difference in efficiency was found when replacing interp1d by
     # UnivariateSpline
     linInterp = interpolate.interp1d(logx, logy, kind=kind)
     logInterp = lambda zz: np.power(10.0, linInterp(np.log10(zz)))
@@ -87,7 +87,7 @@ def logInterp1d(xx, yy, kind='linear'):
 
 
 # This custom implementation of dblquad is based in the one in numpy
-#(Cf. https://github.com/scipy/scipy/blob/v0.16.1/scipy/integrate/quadpack.py#L449 )
+# (Cf. https://github.com/scipy/scipy/blob/v0.16.1/scipy/integrate/quadpack.py#L449 )
 # It was modified to work only in rectangular regions (no g(x) nor h(x))
 # to set the inner integral epsrel
 # and to increase the limit of points taken
@@ -96,7 +96,7 @@ def _infunc(x, func, c, d, more_args, epsrel):
     return integrate.quad(func, c, d, args=myargs, epsrel=epsrel, limit=2000)[0]
 
 
-def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, maxp1=50, limit=50):
+def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, maxp1=50, limit=2000):
     """
     A wrapper around numpy's dblquad to restrict it to a rectangular region and to pass arguments to the 'inner' integral.
 
@@ -121,7 +121,7 @@ def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, ma
 
     """
     return integrate.quad(_infunc, a, b, (func, c, d, args, epsrel),
-                          epsabs=epsabs, epsrel=epsrel, maxp1=maxp1, limit=2000)
+                          epsabs=epsabs, epsrel=epsrel, maxp1=maxp1, limit=limit)
 
 
 def triangle(x, loc=0, size=0.5, area=1):
@@ -144,7 +144,8 @@ def triangle(x, loc=0, size=0.5, area=1):
     # See note there.
     return 0 if abs((x - loc) / size) > 1 else (1 - abs((x - loc) / size)) * abs(area / size)
 
-#--------------------Spectrum model functionality----------------------#
+
+# --------------------Spectrum model functionality----------------------#
 
 
 class Spectrum:
@@ -213,7 +214,7 @@ class Spectrum:
                 y2 (List[float]): The list of y coordinates (density) in the whole spectrum.
 
         """
-        if peak_shape == None or self.discrete == []:
+        if peak_shape is None or self.discrete == []:
             return self.x[:], self.y[:]
         # A mesh for each discrete component:
         discrete_mesh = np.concatenate(list(map(lambda x: np.linspace(
@@ -227,6 +228,7 @@ class Spectrum:
             for l in self.discrete:
                 t += peak(x, loc=l[0], size=l[2]) * l[1]
             return t
+
         y2 = [f(x) + g(x) for x in x2]
         return x2, y2
 
@@ -317,9 +319,9 @@ class Spectrum:
                 {'type': 'scatter', 'subtype': 'straight'})
 
         chart.add_series({
-            'name':       '=Sheet1!$B$1',
+            'name': '=Sheet1!$B$1',
             'categories': '=Sheet1!$A$2:$A$' + str(len(x2) + 1),
-            'values':     '=Sheet1!$B$2:$B$' + str(len(y2) + 1),
+            'values': '=Sheet1!$B$2:$B$' + str(len(y2) + 1),
         })
         chart.set_title({'name': 'Emission spectrum'})
         chart.set_x_axis(
@@ -347,7 +349,7 @@ class Spectrum:
             (float): The calculated norm.
 
         """
-        if weight == None:
+        if weight is None:
             w = lambda x: 1
         else:
             w = weight
@@ -411,12 +413,12 @@ class Spectrum:
         # monotonically decreasing)
         a = 1.0
         if f(a) > 0:
-            while(f(a) > 0):
+            while f(a) > 0:
                 a *= 10.0
             # Now f(a)<=0 and f(a*0.1)>0
             return optimize.brentq(f, a * 0.1, a)
         else:
-            while(f(a) < 0):
+            while f(a) < 0:
                 a *= 0.1
             # Now f(a)>=0 and f(a*10)<0
             return optimize.brentq(f, a, a * 10.0)
@@ -438,15 +440,16 @@ class Spectrum:
         self.discrete = list(
             map(lambda l: [l[0], l[1] * math.exp(-mu(l[0]) * depth), l[2]], self.discrete))
 
-#--------------------Spectrum calculation functionality----------------#
+
+# --------------------Spectrum calculation functionality----------------#
 
 
-def get_fluence(E0=100):
+def get_fluence(E0=100.0):
     """
     Returns a function representing the electron fluence with the distance in CSDA units.
 
     Args:
-        E0: The kinetic energy whose CSDA range is used to scale the distances.
+        E0 (float): The kinetic energy whose CSDA range is used to scale the distances.
 
     Returns:
         A function representing fluence(x,u) with x in CSDA units.
@@ -454,12 +457,12 @@ def get_fluence(E0=100):
     """
     # List of available energies
     E0_str_list = list(map(lambda x: (os.path.split(x)[1]).split(".csv")[
-                       0], glob(os.path.join(data_path, "fluence", "*.csv"))))
+        0], glob(os.path.join(data_path, "fluence", "*.csv"))))
     E0_list = sorted(list(map(int, list(filter(str.isdigit, E0_str_list)))))
 
     E_closest = min(E0_list, key=lambda x: abs(x - E0))
 
-    with open(os.path.join(data_path,"fluence/grid.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "fluence/grid.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -467,7 +470,7 @@ def get_fluence(E0=100):
         t = next(r)
         u = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open(os.path.join(data_path,"fluence","".join([str(E_closest), ".csv"])), 'r') as csvfile:
+    with open(os.path.join(data_path, "fluence", "".join([str(E_closest), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -492,7 +495,7 @@ def get_cs(E0=100):
     """
     # NOTE: Data is given for E0>1keV. CS values below this level should be used with caution.
     # The default behaviour is to keep it constant
-    with open(os.path.join(data_path,"cs/grid.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "cs/grid.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -501,7 +504,7 @@ def get_cs(E0=100):
         t = next(r)
         k = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open(os.path.join(data_path,"cs/74.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "cs/74.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -510,7 +513,8 @@ def get_cs(E0=100):
     scaled = interpolate.RectBivariateSpline(log_e_e, k, t, kx=3, ky=1)
     mElectron = 511
     Z2 = 74 * 74
-    return lambda Eg, u: (u * E0 + mElectron)**2 * Z2 / (u * E0 * Eg * (u * E0 + 2 * mElectron)) * (scaled(np.log10(u * E0), Eg / (u * E0)))
+    return lambda Eg, u: (u * E0 + mElectron) ** 2 * Z2 / (u * E0 * Eg * (u * E0 + 2 * mElectron)) * (
+        scaled(np.log10(u * E0), Eg / (u * E0)))
 
 
 def get_mu(Z=74):
@@ -524,7 +528,7 @@ def get_mu(Z=74):
         The attenuation coefficient mu(E) in cm^-1 as a function of the energy measured in keV.
 
     """
-    with open(os.path.join(data_path,"mu","".join([str(Z), ".csv"])), 'r') as csvfile:
+    with open(os.path.join(data_path, "mu", "".join([str(Z), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -542,7 +546,7 @@ def get_csda():
         The CSDA range in cm in tungsten as a function of the electron kinetic energy in keV.
 
     """
-    with open(os.path.join(data_path,"csda/74.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "csda/74.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -575,7 +579,7 @@ def get_fluence_to_dose():
         A function representing the weighting factor which converts fluence to dose in Gy * cm^2.
 
     """
-    with open(os.path.join(data_path,"fluence2dose/f2d.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "fluence2dose/f2d.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -602,7 +606,7 @@ def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
 
     """
     factor = -mu(eg) / math.sin(math.radians(theta)) / \
-        math.cos(math.radians(phi))
+             math.cos(math.radians(phi))
     return lambda u, x: fluence(x, u) * cs(eg, u) * math.exp(factor * x)
 
 
@@ -663,11 +667,11 @@ def add_char_radiation(s, method="fraction_above_poly"):
             print(
                 "WARNING: Unknown char radiation calculation method. Using fraction_above_poly")
         s.discrete.append([58.65, (0.1912 * fraction_above - 0.00615 *
-                                   fraction_above**2 - 0.1279 * fraction_above**3) * norm, 1])
+                                   fraction_above ** 2 - 0.1279 * fraction_above ** 3) * norm, 1])
         s.discrete.append([67.244, (0.04239 * fraction_above + 0.002003 *
-                                    fraction_above**2 - 0.02356 * fraction_above**3) * norm, 1])
+                                    fraction_above ** 2 - 0.02356 * fraction_above ** 3) * norm, 1])
         s.discrete.append([69.067, (0.01437 * fraction_above + 0.002346 *
-                                    fraction_above**2 - 0.009332 * fraction_above**3) * norm, 1])
+                                    fraction_above ** 2 - 0.009332 * fraction_above ** 3) * norm, 1])
 
     return
 
@@ -708,7 +712,7 @@ def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=conso
     # Prepare spectrum
     s = Spectrum()
     s.x = np.linspace(eMin, E0, num=numE, endpoint=True)
-    # Prepare integrad function
+    # Prepare integrand function
     fluence = get_fluence(E0)
     cs = get_cs(E0)
     mu = get_mu_csda(E0)
@@ -722,14 +726,15 @@ def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=conso
     for i, e_g in enumerate(s.x):
         s.y.append(integrate_source(fluence, cs, mu,
                                     theta, e_g, E0, phi=phi, epsrel=epsrel))
-        if monitor != None:
+        if monitor is not None:
             monitor(i + 1, numE)
 
     add_char_radiation(s)
 
     return s
 
-#---------------------Debug utilities----------------------------------#
+
+# ---------------------Debug utilities----------------------------------#
 
 
 def plot_function(f, x_min, x_max, num=100):
