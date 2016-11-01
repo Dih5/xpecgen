@@ -3,6 +3,8 @@
 [![license GNU GPLv3](https://img.shields.io/badge/license-GNU%20GPLv3-blue.svg)](https://raw.githubusercontent.com/Dih5/xpecgen/master/LICENSE.txt)
 [![Semantic Versioning](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 [![PyPI](https://img.shields.io/pypi/v/xpecgen.svg)](https://pypi.python.org/pypi/xpecgen)
+[![Build Status](https://travis-ci.org/Dih5/xpecgen.svg?branch=master)](https://travis-ci.org/Dih5/xpecgen)
+[![Documentation Status](https://readthedocs.org/projects/xpecgen/badge/?version=latest)](http://xpecgen.readthedocs.io/en/latest/?badge=latest)
 [![Joss status](http://joss.theoj.org/papers/970f9606afd29308e2dcc77216429ee7/status.svg)](http://joss.theoj.org/papers/970f9606afd29308e2dcc77216429ee7)
 
 A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in tungsten anodes.
