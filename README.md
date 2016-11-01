@@ -106,7 +106,9 @@ python -m xpecgen.xpecgenGUI
 
 
 ##Documentation
-You can use the python help system to check the library documentation:
+The updated API documentation is available [here](http://xpecgen.readthedocs.io/en/latest/).
+
+You can also use the python help system to check it:
 ```python3
 from xpecgen import xpecgen as xg
 help(xg)
