@@ -19,12 +19,12 @@
   ],
   "identifier": "",
   "codeRepository": "https://github.com/Dih5/xpecgen",
-  "datePublished": "2016-09-13",
-  "dateModified": "2016-09-13",
+  "datePublished": "2016-11-02",
+  "dateModified": "2016-11-02",
   "dateCreated": "2016-09-13",
   "description": "A python package with a GUI to calculate X-ray sPECtra GENerated in tungsten anodes.",
   "keywords": "x-ray spectra, tungsten anode, computer modeling",
   "license": "GPL v3.0",
   "title": "xpecgen",
-  "version": "v1.0.0"
+  "version": "v1.0.2"
 }
