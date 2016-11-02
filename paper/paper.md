@@ -18,7 +18,15 @@ bibliography: paper.bib
 
 # Summary
 
-xpecgen is a python package to calculate x-ray spectra generated in tungsten anodes using the model of Hernández and Fernández (@hernandez:2016). It includes a Graphical User Interface and allows calculation of half-value-layers, norms, and attenuation. It can also export the calculations in XLSX and CSV formats.
+X-rays tubes are widely used nowadays in medical applications, specially in medical imaging and radiation dosimetry, as
+well in other areas like security scanning or food contaminant irradiation. `xpecgen` is a program designed as a research
+and educational tool for use in medical applications by non-programming experts, as well as providing and API for
+programmers. It may also be of interest in other areas of knowledge where x-ray tubes are used.
+
+
+`xpecgen` is a python package to calculate x-ray spectra generated in tungsten anodes using the model of Hernández and
+Fernández (@hernandez:2016). It includes a Graphical User Interface and allows calculation of half-value-layers, norms,
+and attenuation. It can also export the calculations in XLSX and CSV formats.
 
 -![xpecgen GUI.](DemoPlot.png)
 
