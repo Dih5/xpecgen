@@ -7,11 +7,13 @@ tags:
 authors:
  - name: Guillermo Hernández
    orcid: 0000-0002-7481-5961
-   affiliation: Universidad de Salamanca
+   affiliation: 1
  - name: Francisco Fernández
    orcid: 0000-0002-3732-3415
-   affiliation: Universidad de Salamanca
-  
+   affiliation: 1
+affiliations:
+ - name: Universidad de Salamanca
+   index: 1
 date: 13 September 2016
 bibliography: paper.bib
 ---
