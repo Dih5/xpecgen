@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 #xpecgen script example
-try:
-    from xpecgen import xpecgen as xg
-except ImportError: #If not installed as a package
-    import xpecgen as xg
+
+from __future__ import print_function
+
+from xpecgen import xpecgen as xg
 
 #Define some parameters
 E0=100

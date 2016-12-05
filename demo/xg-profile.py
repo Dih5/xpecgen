@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+#Example of profiling the xpecgen calculations
+
 import cProfile
 
-try:
-    from xpecgen import xpecgen as xg
-except ImportError: #If not installed as a package
-    import xpecgen as xg
+from xpecgen import xpecgen as xg
 
-#Example to profile the time spent in a calculation
 cProfile.run('xg.calculate_spectrum(100,12,3,50)')
