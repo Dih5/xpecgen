@@ -22,8 +22,6 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 	* [Install python and the packages](#install-python-and-the-packages)
 * [Download and run](#download-and-run)
 * [Documentation](#documentation)
-* [License](#license)
-* [Versioning](#versioning)
 * [Model details](#model-details)
 * [Citation](#citation)
 * [References](#references)
@@ -119,16 +117,6 @@ You can also use the python help system to check it:
 from xpecgen import xpecgen as xg
 help(xg)
 ```
-
-
-## License
-This package is released under
-[the GNU GPLv3 license](https://raw.githubusercontent.com/Dih5/xpecgen/master/LICENSE.txt).
-
-
-## Versioning
-Releases of this package will be numbered using
-[Semantic Versioning guidelines](http://semver.org/).
 
 ## Contributing
 Check [CONTRIBUTING.md](CONTRIBUTING.md).
