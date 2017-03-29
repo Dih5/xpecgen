@@ -24,7 +24,6 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 * [Documentation](#documentation)
 * [License](#license)
 * [Versioning](#versioning)
-* [Requests](#requests)
 * [Model details](#model-details)
 * [Citation](#citation)
 * [References](#references)
@@ -65,11 +64,11 @@ The last one is only needed if you want to make use of the GUI.
 You can [install a scientific python distribution](#install-a-scientific-python-distribution) providing them or you can install [only what you need](#install-python-and-the-packages). The first is recommended for Windows users, the latter for Linux users.
 
 
-###Install a scientific python distribution:
+### Install a scientific python distribution:
 For example you can try [Anaconda](https://www.continuum.io/downloads).
 Since this will install pip, you might want to use the [pip installer](#installation).
 
-###Install python and the packages:
+### Install python and the packages:
 - Download [python](https://www.python.org/) for your OS. See specific instructions to install from repositories below.
 - Use the [pip installer](#Installation) (recommended) or manually install the additional packages. See specific instructions below for installs based on python 3.X.
 
@@ -103,7 +102,7 @@ sudo pip install openpyxl
 ```
 On Fedora 23 onwards, use dnf instead of yum
 
-##Download and run
+## Download and run
 You can also download and execute the program without installing it, as long as you meet the [requisites](#requisites).
 Download and extract the [zip file](https://github.com/Dih5/xpecgen/archive/master.zip) of the repository.
 To start the GUI, open xpecgen/xpecgenGUI.py  as a package with your python interpreter: 
@@ -112,7 +111,7 @@ python -m xpecgen.xpecgenGUI
 ```
 
 
-##Documentation
+## Documentation
 The updated API documentation is available [here](http://xpecgen.readthedocs.io/en/latest/).
 
 You can also use the python help system to check it:
@@ -122,7 +121,7 @@ help(xg)
 ```
 
 
-##License
+## License
 This package is released under
 [the GNU GPLv3 license](https://raw.githubusercontent.com/Dih5/xpecgen/master/LICENSE.txt).
 
@@ -143,7 +142,7 @@ Half-value layers are calculated using the exponential model of attenuation (aka
 ## Citation
 If you use this application to make use of the models in [\[1\]](#Ref1), you should cite it. If you also want to acknowledge the implementation itself you can also cite [\[2\]](#Ref2).
 
-##References
+## References
 <a name="Ref1">\[1\]</a> Hernández, G., Fernández F. 2016. "A model of tungsten x-ray anode spectra." Medical Physics, *43* 4655. [doi:10.1118/1.4955120](http://dx.doi.org/10.1118/1.4955120).
 
 <a name="Ref2">\[2\]</a> Hernández, G., Fernández F. 2016. "xpecgen: A program to calculate x-ray spectra generated in tungsten anodes." The Journal of Open Source Software, *00062*. [doi:10.21105/joss.00062](http://dx.doi.org/10.21105/joss.00062).
