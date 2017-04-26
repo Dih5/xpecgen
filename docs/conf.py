@@ -31,7 +31,7 @@ from unittest.mock import MagicMock
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
-            return Mock()
+            return MagicMock()
 
 if on_rtd:
     MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'xlsxwriter','matplotlib.pyplot','matplotlib.backends',
