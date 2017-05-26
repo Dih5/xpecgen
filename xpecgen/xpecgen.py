@@ -591,7 +591,10 @@ def get_fluence_to_dose():
 
 def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
     """
-    Returns the attenuated source function for the given parameters. An E_0-dependent factor is excluded.
+    Returns the attenuated source function (Eq. 2 in the paper) for the given parameters.
+
+    An E_0-dependent factor (the fraction found there) is excluded. However, the E_0 dependence is removed in
+    integrate_source.
 
     Args:
         fluence: The function representing the fluence.
@@ -612,7 +615,9 @@ def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
 
 def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max=0.6, epsrel=0.1):
     """
-    Find the integral of the attenuated source function. An E_0-dependent factor is excluded.
+    Find the integral of the attenuated source function.
+
+    An E_0-independent factor is excluded (i.e., the E_0 dependence on get_source_function is taken into account here).
 
     Args:
         fluence: The function representing the fluence.
@@ -634,6 +639,8 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
     f = get_source_function(fluence, cs, mu, theta, e_g, phi=phi)
     (y, yerr) = custom_dblquad(f, x_min, x_max,
                                e_g / e_0, 1, epsrel=epsrel, limit=100)
+    # The factor includes n_med, its units being 1/(mb * r_CSDA). We only take into account the r_CSDA dependence.
+    y /= get_csda()(e_0)
     return y
 
 
