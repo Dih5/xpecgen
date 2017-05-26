@@ -698,6 +698,51 @@ def console_monitor(a, b):
     print("Calculation: ", a, "/", b)
 
 
+def calculate_spectrum_mesh(E0, theta, mesh, phi=0.0, epsrel=0.2, monitor=console_monitor):
+    """
+    Calculates the x-ray spectrum for given parameters.
+    Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
+
+    Args:
+        E0 (float): Electron kinetic energy in keV
+        theta (float): X-ray emission angle in degrees, the normal being at 90º
+        mesh (list of float): The photon energies where the integral will be evaluated
+        eMin (float): Minimum kinetic energy to calculate in the spectrum in keV
+        numE (int): Number of points to calculate in the spectrum
+        phi (float): X-ray emission elevation angle in degrees.
+        epsrel (float): The tolerance parameter used in numeric integration.
+        monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
+
+    Returns:
+        :obj:`Spectrum`: The calculated spectrum
+
+    """
+    # Prepare spectrum
+    s = Spectrum()
+    s.x = mesh
+    mesh_len = len(mesh)
+    # Prepare integrand function
+    fluence = get_fluence(E0)
+    cs = get_cs(E0)
+    mu = get_mu_csda(E0)
+
+    # quad may raise warnings about the numerical integration method,
+    # which are related to the estimated accuracy. Since this is not relevant,
+    # they are suppressed.
+    warnings.simplefilter("ignore")
+
+    # TODO: (?) multiprocessing might be added here in the future
+    for i, e_g in enumerate(s.x):
+        s.y.append(integrate_source(fluence, cs, mu,
+                                    theta, e_g, E0, phi=phi, epsrel=epsrel))
+        if monitor is not None:
+            monitor(i + 1, mesh_len)
+
+    add_char_radiation(s)
+
+    return s
+
+
 def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=console_monitor):
     """
     Calculates the x-ray spectrum for given parameters.
@@ -716,29 +761,8 @@ def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=conso
         :obj:`Spectrum`: The calculated spectrum
 
     """
-    # Prepare spectrum
-    s = Spectrum()
-    s.x = np.linspace(eMin, E0, num=numE, endpoint=True)
-    # Prepare integrand function
-    fluence = get_fluence(E0)
-    cs = get_cs(E0)
-    mu = get_mu_csda(E0)
-
-    # quad may raise warnings about the numerical integration method,
-    # which are related to the estimated accuracy. Since this is not relevant,
-    # they are suppressed.
-    warnings.simplefilter("ignore")
-
-    # TODO: (?) multiprocessing might be added here in the future
-    for i, e_g in enumerate(s.x):
-        s.y.append(integrate_source(fluence, cs, mu,
-                                    theta, e_g, E0, phi=phi, epsrel=epsrel))
-        if monitor is not None:
-            monitor(i + 1, numE)
-
-    add_char_radiation(s)
-
-    return s
+    return calculate_spectrum_mesh(E0, theta, np.linspace(eMin, E0, num=numE, endpoint=True), phi=phi, epsrel=epsrel,
+                                   monitor=monitor)
 
 
 # ---------------------Debug utilities----------------------------------#
