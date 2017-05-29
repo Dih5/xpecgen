@@ -152,6 +152,12 @@ class Spectrum:
     """
     Set of 2D points and discrete components representing a spectrum.
 
+    A Spectrum can be multiplied by a scalar (int, float...) to increase its counts in such a factor.
+    Two spectra can be added if they share their x axes and their discrete component positions.
+
+    Note: When two spectrum are added it is not checked it that addition makes sense. It is the user's responsibility to
+          do so.
+
     Attributes:
         x (:obj:`numpy.ndarray`): x coordinates (energy) describing the continuum part of the spectrum.
         y (:obj:`numpy.ndarray`): y coordinates (pdf) describing the continuum part of the spectrum.
@@ -440,6 +446,30 @@ class Spectrum:
         self.discrete = list(
             map(lambda l: [l[0], l[1] * math.exp(-mu(l[0]) * depth), l[2]], self.discrete))
 
+    def __add__(self, other):
+        """Add two instances, assuming that makes sense."""
+        if not isinstance(other, Spectrum):  # so s+0=s and sum([s1, s2,...]) makes sense
+            return self
+        s = Spectrum()
+        s.x = self.x
+        s.y = [a+b for a,b in zip(self.y, other.y)]
+        s.discrete = [[a[0], a[1] + b[1], a[2]] for a,b in zip(self.discrete, other.discrete)]
+        return s
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __mul__(self, other):
+        """Multiply the counts by an scalar."""
+        s2 = self.clone()
+        s2.y = [a * other for a in self.y]
+        s2.discrete = [[a[0], a[1] * other, a[2]] for a in self.discrete]
+        return s2
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+
 
 # --------------------Spectrum calculation functionality----------------#
 
@@ -634,7 +664,7 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
     Returns:
         float: The value of the integral.
     """
-    if e_g == e_0:
+    if e_g >= e_0:
         return 0
     f = get_source_function(fluence, cs, mu, theta, e_g, phi=phi)
     (y, yerr) = custom_dblquad(f, x_min, x_max,
