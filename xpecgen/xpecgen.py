@@ -5,85 +5,47 @@
 
 from __future__ import print_function
 
-# ----------------------------------------------------------------------#
-#                               ,
-#                              ▓█      ██
-#                             ▄█▌      ╙█▌
-#                             ▀█▌      "█▌
-#                             ▐█H ╓▄▄▄  █▌
-#                             ▓█▄╣█████╥██
-#                     ▄▄┐    ▄ ▐█▌ ██M╫█▌ ╓     ▄▄µ
-#                 ▄▄  ▐██   ▐▄ ▓█  ██Γ █▀⌐.▄   ║█▌  ╓▄
-#                 ▀█▓▓▄██    ▀▄ ▓▌ ██┐▐█ ▄▀    ▓█▌▄▓██
-#                   `▀▀███▄ A`╙▄╝└▓███"▀▄▀`ⁿµ,███▀▀"   .
-#  -██████▄▄,,   ╓     ╙████▄▄▄█▄ⁿ⌐   ═▄█▄▄,████▀     ▄   ,,╓▄▄█████W
-#        `╙▀▀██, ╓ ╙╗.'""▀█▌▀▀█████████████▀▀██T"*.▄▀,, ,▄█▀▀▀Γ'
-#         ╓▓██╙██▀▄▄ "▓▄ ██W  ██████▀█████,  ██▌▄▄M ▄▄█▀█▀▄█▓▄
-# ¢█▄,     ██████▄,[▐█Γ ⌠███████▀███▌║███████████░ "█▌[,▄█▓████     ,▄▓▌
-# ╙▀███▄▄,╙█▀▄║▀▀▀███▌ `███████████▓████████████D ▐███▀▀▀▀▄▀█▀,▄▄▓██▀▀
-#    Γ T▀▀█▀▀▀█▄╗▌▄▌▀, ▓███▀▀██████████████▀▀████ ┌▀▀▄▄▌Φ█▀▀▀██▀Γ T
-#           .▄ "%,,▓▄▄▓█████████████████▓█████████▄▄█╓,/^,,=
-#            `"Γ "  └██▓███████████████████████████Γ  ^ ╙▀
-#          ,,    ,▄▓▄█▌  ▐██▓████▓█████████▓██▌` ▀█▓▄▒,    ,,
-#         █████▓███████▓▄██████▀██████▓█▀██████▄▄███████▓█████⌐
-#            ╓▓█▀╙" ▌ "▓██████▄▓████▀████▄███████▀ ║⌐╙▀▀██▄
-#          Φ███     ¡╓K█`╘⌐▀████████████████▀╙╡ ▓▀╗╡     ▀██▌
-#                ,ΦΓ╟ ▄▓╖▓▄µ ╠▀███▌  ▐████║ ,▄▓▄▀▄,╣7▀,
-#               `" ╓█M▀ ▓███╓,▄█▀██▓▄██▀╢▌,,▓███ ╙▀▓▌ ▀
-#               ▄▄▄██"▄▓█" ▄▌ ▓  ╓▓███=  ▀ ╙█=`▀█▓ ▀█▓▄▄
-#              ▄█▌└█████▀▄▄▌e`▌   ║███   ╘M%▄█▄▐▀██▓█▄ █▄
-#            ▄▓█╨  ▀████▐█▀ ▄▄Γ   ▄██▌    ▀▄ ╙██▓████"  ██▄
-#           ╓██      "└╓▓█w      ▄█▌╙██▄   .  ██▄'l      ▀█▄
-#           ██       ,▄█▀       ╙██  ▐██       ╙██▄       ▓█
-#                  ,▄██H                         ██▄▄
-#                 ▓█▀                              ▀██⌐
-#
-# ----------------------------------------------------------------------#
-__author__ = 'Dih5'
-__version__ = "1.0.2"
-# ----------------------------------------------------------------------#
-
 import math
+from bisect import bisect_left
+import os
+from glob import glob
+import warnings
+import csv
+
+import numpy as np
+from scipy import interpolate, integrate, optimize
+import xlsxwriter
 import matplotlib.pyplot as plt
 
 plt.ion()
-import numpy as np
-from scipy import interpolate, integrate, optimize
 
-from bisect import bisect_left
-
-import os
-from glob import glob
-
-import warnings
-
-import csv
-import xlsxwriter
+__author__ = 'Dih5'
+__version__ = "1.0.2"
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 # --------------------General purpose functions-------------------------#
 
-def logInterp1d(xx, yy, kind='linear'):
+def log_interp_1d(xx, yy, kind='linear'):
     """
     Perform interpolation in log-log scale.
 
     Args:
         xx (List[float]): x-coordinates of the points.
         yy (List[float]): y-coordinates of the points.
-        kind (str or int, optional): The kind of interpolation in the log-log domain. This is passed to scipy.interpolate.interp1d.
+        kind (str or int, optional): The kind of interpolation in the log-log domain. This is passed to
+                                     scipy.interpolate.interp1d.
 
     Returns:
         A function whose call method uses interpolation in log-log scale to find the value at a given point.
     """
-    logx = np.log10(xx)
-    logy = np.log10(yy)
+    log_x = np.log(xx)
+    log_y = np.log(yy)
     # No big difference in efficiency was found when replacing interp1d by
     # UnivariateSpline
-    linInterp = interpolate.interp1d(logx, logy, kind=kind)
-    logInterp = lambda zz: np.power(10.0, linInterp(np.log10(zz)))
-    return logInterp
+    lin_interp = interpolate.interp1d(log_x, log_y, kind=kind)
+    return lambda zz: np.exp(lin_interp(np.log(zz)))
 
 
 # This custom implementation of dblquad is based in the one in numpy
@@ -98,7 +60,8 @@ def _infunc(x, func, c, d, more_args, epsrel):
 
 def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, maxp1=50, limit=2000):
     """
-    A wrapper around numpy's dblquad to restrict it to a rectangular region and to pass arguments to the 'inner' integral.
+    A wrapper around numpy's dblquad to restrict it to a rectangular region and to pass arguments to the 'inner'
+    integral.
 
     Args:
         func: The integrand function f(y,x).
@@ -107,10 +70,11 @@ def custom_dblquad(func, a, b, c, d, args=(), epsabs=1.49e-8, epsrel=1.49e-8, ma
         c (float): The lower bound of the first argument in the integrand function.
         d (float): The upper bound of the first argument in the integrand function.
         args (sequence, optional): extra arguments to pass to func.
-        epsabs (float, optional): Absolute tolerance passed directly to the inner 1-D quadrature integration. Default is 1.49e-8.
+        epsabs (float, optional): Absolute tolerance passed directly to the inner 1-D quadrature integration.
         epsrel (float, optional): Relative tolerance of the inner 1-D integrals. Default is 1.49e-8.
         maxp1 (float or int, optional): An upper bound on the number of Chebyshev moments.
-        limit (int, optional): Upper bound on the number of cycles (>=3) for use with a sinusoidal weighting and an infinite end-point.
+        limit (int, optional): Upper bound on the number of cycles (>=3) for use with a sinusoidal weighting and an
+                               infinite end-point.
 
     Returns:
         (tuple): tuple containing:
@@ -403,9 +367,9 @@ class Spectrum:
         # would probably make no sense
 
         # Use low-energy cutoff
-        lowIndex = bisect_left(self.x, energy_min)
-        x = self.x[lowIndex:]
-        y = self.y[lowIndex:]
+        low_index = bisect_left(self.x, energy_min)
+        x = self.x[low_index:]
+        y = self.y[low_index:]
         # Normalize to 1 with weighting function
         y2 = list(map(lambda a, b: weight(a) * b, x, y))
         discrete2 = [weight(a[0]) * a[1] for a in self.discrete]
@@ -452,8 +416,8 @@ class Spectrum:
             return self
         s = Spectrum()
         s.x = self.x
-        s.y = [a+b for a,b in zip(self.y, other.y)]
-        s.discrete = [[a[0], a[1] + b[1], a[2]] for a,b in zip(self.discrete, other.discrete)]
+        s.y = [a + b for a, b in zip(self.y, other.y)]
+        s.discrete = [[a[0], a[1] + b[1], a[2]] for a, b in zip(self.discrete, other.discrete)]
         return s
 
     def __radd__(self, other):
@@ -470,27 +434,26 @@ class Spectrum:
         return self.__mul__(other)
 
 
-
 # --------------------Spectrum calculation functionality----------------#
 
 
-def get_fluence(E0=100.0):
+def get_fluence(e_0=100.0):
     """
     Returns a function representing the electron fluence with the distance in CSDA units.
 
     Args:
-        E0 (float): The kinetic energy whose CSDA range is used to scale the distances.
+        e_0 (float): The kinetic energy whose CSDA range is used to scale the distances.
 
     Returns:
         A function representing fluence(x,u) with x in CSDA units.
 
     """
     # List of available energies
-    E0_str_list = list(map(lambda x: (os.path.split(x)[1]).split(".csv")[
+    e0_str_list = list(map(lambda x: (os.path.split(x)[1]).split(".csv")[
         0], glob(os.path.join(data_path, "fluence", "*.csv"))))
-    E0_list = sorted(list(map(int, list(filter(str.isdigit, E0_str_list)))))
+    e0_list = sorted(list(map(int, list(filter(str.isdigit, e0_str_list)))))
 
-    E_closest = min(E0_list, key=lambda x: abs(x - E0))
+    e_closest = min(e0_list, key=lambda x: abs(x - e_0))
 
     with open(os.path.join(data_path, "fluence/grid.csv"), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
@@ -500,7 +463,7 @@ def get_fluence(E0=100.0):
         t = next(r)
         u = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open(os.path.join(data_path, "fluence", "".join([str(E_closest), ".csv"])), 'r') as csvfile:
+    with open(os.path.join(data_path, "fluence", "".join([str(e_closest), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -512,12 +475,12 @@ def get_fluence(E0=100.0):
     # return lambda x,u:f(x,u)[0]
 
 
-def get_cs(E0=100):
+def get_cs(e_0=100):
     """
     Returns a function representing the scaled bremsstrahlung cross_section.
 
     Args:
-        E0 (float): The electron kinetic energy, used to scale u=e_e/E0.
+        e_0 (float): The electron kinetic energy, used to scale u=e_e/e_0.
 
     Returns:
         A function representing cross_section(e_g,u) in mb/keV, with e_g in keV.
@@ -541,31 +504,31 @@ def get_cs(E0=100):
             t.append([float(a) for a in row[0].split(",")])
     t = np.array(t)
     scaled = interpolate.RectBivariateSpline(log_e_e, k, t, kx=3, ky=1)
-    mElectron = 511
-    Z2 = 74 * 74
-    return lambda Eg, u: (u * E0 + mElectron) ** 2 * Z2 / (u * E0 * Eg * (u * E0 + 2 * mElectron)) * (
-        scaled(np.log10(u * E0), Eg / (u * E0)))
+    m_electron = 511
+    z2 = 74 * 74
+    return lambda e_g, u: (u * e_0 + m_electron) ** 2 * z2 / (u * e_0 * e_g * (u * e_0 + 2 * m_electron)) * (
+        scaled(np.log10(u * e_0), e_g / (u * e_0)))
 
 
-def get_mu(Z=74):
+def get_mu(z=74):
     """
     Returns a function representing an energy-dependent attenuation coefficient.
 
     Args:
-        Z (int or str): The identifier of the material in the data folder, typically the atomic number.
+        z (int or str): The identifier of the material in the data folder, typically the atomic number.
 
     Returns:
         The attenuation coefficient mu(E) in cm^-1 as a function of the energy measured in keV.
 
     """
-    with open(os.path.join(data_path, "mu", "".join([str(Z), ".csv"])), 'r') as csvfile:
+    with open(os.path.join(data_path, "mu", "".join([str(z), ".csv"])), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
         x = [float(a) for a in t[0].split(",")]
         t = next(r)
         y = [float(a) for a in t[0].split(",")]
-    return logInterp1d(x, y)
+    return log_interp_1d(x, y)
 
 
 def get_csda():
@@ -586,19 +549,19 @@ def get_csda():
     return interpolate.interp1d(x, y, kind='linear')
 
 
-def get_mu_csda(E0):
+def get_mu_csda(e_0):
     """
     Returns a function representing the CSDA-scaled energy-dependent attenuation coefficient in tungsten.
 
     Args:
-        E0 (float): The electron initial kinetic energy.
+        e_0 (float): The electron initial kinetic energy.
 
     Returns:
         The attenuation coefficient mu(E) in CSDA units as a function of the energy measured in keV.
     """
     mu = get_mu(74)
-    csda = get_csda()(E0)
-    return lambda E: mu(E) * csda
+    csda = get_csda()(e_0)
+    return lambda e: mu(e) * csda
 
 
 def get_fluence_to_dose():
@@ -619,7 +582,7 @@ def get_fluence_to_dose():
     return interpolate.interp1d(x, y, kind='linear')
 
 
-def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
+def get_source_function(fluence, cs, mu, theta, e_g, phi=0.0):
     """
     Returns the attenuated source function (Eq. 2 in the paper) for the given parameters.
 
@@ -631,16 +594,15 @@ def get_source_function(fluence, cs, mu, theta, eg, phi=0.0):
         cs: The function representing the bremsstrahlung cross-section.
         mu: The function representing the attenuation coefficient.
         theta (float): The emission angle in degrees, the anode's normal being at 90º.
-        eg (float): The emitted photon energy in keV.
+        e_g (float): The emitted photon energy in keV.
         phi (float): The elevation angle in degrees, the anode's normal being at 12º.
 
     Returns:
         The attenuated source function s(u,x).
 
     """
-    factor = -mu(eg) / math.sin(math.radians(theta)) / \
-             math.cos(math.radians(phi))
-    return lambda u, x: fluence(x, u) * cs(eg, u) * math.exp(factor * x)
+    factor = -mu(e_g) / math.sin(math.radians(theta)) / math.cos(math.radians(phi))
+    return lambda u, x: fluence(x, u) * cs(e_g, u) * math.exp(factor * x)
 
 
 def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max=0.6, epsrel=0.1):
@@ -667,8 +629,7 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
     if e_g >= e_0:
         return 0
     f = get_source_function(fluence, cs, mu, theta, e_g, phi=phi)
-    (y, yerr) = custom_dblquad(f, x_min, x_max,
-                               e_g / e_0, 1, epsrel=epsrel, limit=100)
+    (y, y_err) = custom_dblquad(f, x_min, x_max, e_g / e_0, 1, epsrel=epsrel, limit=100)
     # The factor includes n_med, its units being 1/(mb * r_CSDA). We only take into account the r_CSDA dependence.
     y /= get_csda()(e_0)
     return y
@@ -728,17 +689,15 @@ def console_monitor(a, b):
     print("Calculation: ", a, "/", b)
 
 
-def calculate_spectrum_mesh(E0, theta, mesh, phi=0.0, epsrel=0.2, monitor=console_monitor):
+def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=console_monitor):
     """
     Calculates the x-ray spectrum for given parameters.
     Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
 
     Args:
-        E0 (float): Electron kinetic energy in keV
+        e_0 (float): Electron kinetic energy in keV
         theta (float): X-ray emission angle in degrees, the normal being at 90º
-        mesh (list of float): The photon energies where the integral will be evaluated
-        eMin (float): Minimum kinetic energy to calculate in the spectrum in keV
-        numE (int): Number of points to calculate in the spectrum
+        mesh (list of float or ndarray): The photon energies where the integral will be evaluated
         phi (float): X-ray emission elevation angle in degrees.
         epsrel (float): The tolerance parameter used in numeric integration.
         monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
@@ -752,9 +711,9 @@ def calculate_spectrum_mesh(E0, theta, mesh, phi=0.0, epsrel=0.2, monitor=consol
     s.x = mesh
     mesh_len = len(mesh)
     # Prepare integrand function
-    fluence = get_fluence(E0)
-    cs = get_cs(E0)
-    mu = get_mu_csda(E0)
+    fluence = get_fluence(e_0)
+    cs = get_cs(e_0)
+    mu = get_mu_csda(e_0)
 
     # quad may raise warnings about the numerical integration method,
     # which are related to the estimated accuracy. Since this is not relevant,
@@ -764,7 +723,7 @@ def calculate_spectrum_mesh(E0, theta, mesh, phi=0.0, epsrel=0.2, monitor=consol
     # TODO: (?) multiprocessing might be added here in the future
     for i, e_g in enumerate(s.x):
         s.y.append(integrate_source(fluence, cs, mu,
-                                    theta, e_g, E0, phi=phi, epsrel=epsrel))
+                                    theta, e_g, e_0, phi=phi, epsrel=epsrel))
         if monitor is not None:
             monitor(i + 1, mesh_len)
 
@@ -773,16 +732,16 @@ def calculate_spectrum_mesh(E0, theta, mesh, phi=0.0, epsrel=0.2, monitor=consol
     return s
 
 
-def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=console_monitor):
+def calculate_spectrum(e_0, theta, e_min, num_e, phi=0.0, epsrel=0.2, monitor=console_monitor):
     """
     Calculates the x-ray spectrum for given parameters.
     Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
 
     Args:
-        E0 (float): Electron kinetic energy in keV
+        e_0 (float): Electron kinetic energy in keV
         theta (float): X-ray emission angle in degrees, the normal being at 90º
-        eMin (float): Minimum kinetic energy to calculate in the spectrum in keV
-        numE (int): Number of points to calculate in the spectrum
+        e_min (float): Minimum kinetic energy to calculate in the spectrum in keV
+        num_e (int): Number of points to calculate in the spectrum
         phi (float): X-ray emission elevation angle in degrees.
         epsrel (float): The tolerance parameter used in numeric integration.
         monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
@@ -791,7 +750,8 @@ def calculate_spectrum(E0, theta, eMin, numE, phi=0.0, epsrel=0.2, monitor=conso
         :obj:`Spectrum`: The calculated spectrum
 
     """
-    return calculate_spectrum_mesh(E0, theta, np.linspace(eMin, E0, num=numE, endpoint=True), phi=phi, epsrel=epsrel,
+    return calculate_spectrum_mesh(e_0, theta, np.linspace(e_min, e_0, num=num_e, endpoint=True), phi=phi,
+                                   epsrel=epsrel,
                                    monitor=monitor)
 
 
@@ -807,7 +767,6 @@ def plot_function(f, x_min, x_max, num=100):
         x_min (float): Minimum argument value.
         x_max (float): Maximum argument value.
         num (int): Number of points to calculate for the plot.
-
 
     """
     x = np.linspace(x_min, x_max, num=num, endpoint=True)
