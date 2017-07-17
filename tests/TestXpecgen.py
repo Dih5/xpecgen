@@ -84,6 +84,15 @@ class XpecgenTest(unittest.TestCase):
         self.assertAlmostEqual(hvl80, 1.85, places=1)
         self.assertAlmostEqual(hvl50, 1.20, places=1)
 
+    def test_linear_combination(self):
+        """Test linear combinations with Spectrum instances"""
+        s2 = s.clone()
+        s3 = s2+s2
+        s4 = s2*2
+        # Check same values
+        self.assertEqual(list(s3.x), list(s4.x))
+        self.assertEqual(list(s3.y), list(s4.y))
+        self.assertEqual(list(s3.discrete), list(s4.discrete))
 
 if __name__ == "__main__":
     unittest.main()

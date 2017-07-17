@@ -5,44 +5,6 @@
 
 from __future__ import print_function
 
-# ----------------------------------------------------------------------#
-#                               ,
-#                              ▓█      ██
-#                             ▄█▌      ╙█▌
-#                             ▀█▌      "█▌
-#                             ▐█H ╓▄▄▄  █▌
-#                             ▓█▄╣█████╥██
-#                     ▄▄┐    ▄ ▐█▌ ██M╫█▌ ╓     ▄▄µ
-#                 ▄▄  ▐██   ▐▄ ▓█  ██Γ █▀⌐.▄   ║█▌  ╓▄
-#                 ▀█▓▓▄██    ▀▄ ▓▌ ██┐▐█ ▄▀    ▓█▌▄▓██
-#                   `▀▀███▄ A`╙▄╝└▓███"▀▄▀`ⁿµ,███▀▀"   .
-#  -██████▄▄,,   ╓     ╙████▄▄▄█▄ⁿ⌐   ═▄█▄▄,████▀     ▄   ,,╓▄▄█████W
-#        `╙▀▀██, ╓ ╙╗.'""▀█▌▀▀█████████████▀▀██T"*.▄▀,, ,▄█▀▀▀Γ'
-#         ╓▓██╙██▀▄▄ "▓▄ ██W  ██████▀█████,  ██▌▄▄M ▄▄█▀█▀▄█▓▄
-# ¢█▄,     ██████▄,[▐█Γ ⌠███████▀███▌║███████████░ "█▌[,▄█▓████     ,▄▓▌
-# ╙▀███▄▄,╙█▀▄║▀▀▀███▌ `███████████▓████████████D ▐███▀▀▀▀▄▀█▀,▄▄▓██▀▀
-#    Γ T▀▀█▀▀▀█▄╗▌▄▌▀, ▓███▀▀██████████████▀▀████ ┌▀▀▄▄▌Φ█▀▀▀██▀Γ T
-#           .▄ "%,,▓▄▄▓█████████████████▓█████████▄▄█╓,/^,,=
-#            `"Γ "  └██▓███████████████████████████Γ  ^ ╙▀
-#          ,,    ,▄▓▄█▌  ▐██▓████▓█████████▓██▌` ▀█▓▄▒,    ,,
-#         █████▓███████▓▄██████▀██████▓█▀██████▄▄███████▓█████⌐
-#            ╓▓█▀╙" ▌ "▓██████▄▓████▀████▄███████▀ ║⌐╙▀▀██▄
-#          Φ███     ¡╓K█`╘⌐▀████████████████▀╙╡ ▓▀╗╡     ▀██▌
-#                ,ΦΓ╟ ▄▓╖▓▄µ ╠▀███▌  ▐████║ ,▄▓▄▀▄,╣7▀,
-#               `" ╓█M▀ ▓███╓,▄█▀██▓▄██▀╢▌,,▓███ ╙▀▓▌ ▀
-#               ▄▄▄██"▄▓█" ▄▌ ▓  ╓▓███=  ▀ ╙█=`▀█▓ ▀█▓▄▄
-#              ▄█▌└█████▀▄▄▌e`▌   ║███   ╘M%▄█▄▐▀██▓█▄ █▄
-#            ▄▓█╨  ▀████▐█▀ ▄▄Γ   ▄██▌    ▀▄ ╙██▓████"  ██▄
-#           ╓██      "└╓▓█w      ▄█▌╙██▄   .  ██▄'l      ▀█▄
-#           ██       ,▄█▀       ╙██  ▐██       ╙██▄       ▓█
-#                  ,▄██H                         ██▄▄
-#                 ▓█▀                              ▀██⌐
-#
-# ----------------------------------------------------------------------#
-__author__ = "Dih5"
-# ----------------------------------------------------------------------#
-
-
 from tkinter import *
 from tkinter.ttk import *
 import tkinter.filedialog
@@ -61,6 +23,8 @@ from glob import glob
 import re  # Regular expressions, used for sorting
 
 from . import xpecgen as xg
+
+__author__ = "Dih5"
 
 
 class CreateToolTip(object):
@@ -568,13 +532,17 @@ class XpecgenGUI(Notebook):
         Calculates a new spectrum using the parameters in the GUI.
 
         """
+        self.calculation_count = 0
+        self.calculation_total = self.NumE.get()
+
+        def monitor(a, b):  # Values are only collected. Tk must be updated from main thread only.
+            self.calculation_count = a
+            self.calculation_total = b
 
         def callback():  # Carry the calculation in a different thread to avoid blocking
             s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(
-            ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=self.monitor_bar)
+            ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor)
             self.spectra = [s]
-            self.lstHistory.delete(0, END)
-            self.lstHistory.insert(END, "Calculated")
             self.queue_calculation.put(1)
 
         try:
@@ -601,10 +569,13 @@ class XpecgenGUI(Notebook):
 
     def wait_for_calculation(self):
         """
-        Polling method to wait for the calculation thread to finish.
+        Polling method to wait for the calculation thread to finish. Also updates monitor_bar.
 
         """
+        self.monitor_bar(self.calculation_count, self.calculation_total)
         if self.queue_calculation.full():
+            self.lstHistory.delete(0, END)
+            self.lstHistory.insert(END, "Calculated")
             self.cmdCalculate["state"] = "normal"
             self.enable_analyze_buttons()
             self.monitor_bar(0, 0)
