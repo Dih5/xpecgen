@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 plt.ion()
 
 __author__ = 'Dih5'
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
