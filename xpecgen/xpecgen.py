@@ -777,3 +777,72 @@ def plot_function(f, x_min, x_max, num=100):
     y = f2(x)
     plt.plot(x, y, '-')
     plt.show()
+
+
+if __name__ == '__main__':
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(description='Calculate a bremsstrahlung spectrum.')
+    parser.add_argument('e_0', metavar='E0', type=float,
+                        help='Electron kinetic energy in keV')
+    parser.add_argument('theta', metavar='theta', type=float, default=12,
+                        help="X-ray emission angle in degrees, the anode's normal being at 90º.")
+
+    parser.add_argument('--phi', metavar='phi', type=float, default=0,
+                        help="X-ray emission altitude in degrees, the anode's normal being at 0º.")
+
+    parser.add_argument('--e_min', metavar='e_min', type=float, default=3.0,
+                        help="Minimum kinetic energy in keV in the bremsstrahlung calculation.")
+
+    parser.add_argument('--n_points', metavar='n_points', type=int, default=50,
+                        help="Number of points used in the bremsstrahlung calculation.")
+
+    parser.add_argument('--mesh', metavar='e_i', type=float, nargs='+',
+                        help="Energy mesh where the bremsstrahlung will be calculated. "
+                             "Overrides e_min and n_points parameters.")
+
+    parser.add_argument('--epsrel', metavar='tolerance', type=float, default=0.5,
+                        help="Numerical tolerance in integration.")
+
+    parser.add_argument('-o', '--output', metavar='path', type=str,
+                        help="Output file. Available formats are csv, xlsx, and pkl, selected by the file extension. "
+                             "pkl appends objects using the pickle module. Note you have to import the Spectrum class "
+                             " INTO THE NAMESPACE (e.g., from xpecgen.xpecgen import Spectrum) to load them. "
+                             "If this argument is not provided, points are written to the standard output and "
+                             "calculation monitor is not displayed.")
+
+    args = parser.parse_args()
+
+    if args.output is not None:
+        if "." not in args.output:
+            print("Output file format unknown", file=sys.stderr)
+            exit(-1)
+        else:
+            ext = args.output.split(".")[-1].lower()
+            if ext not in ["csv", "xlsx", "pkl"]:
+                print("Output file format unknown", file=sys.stderr)
+                exit(-1)
+        monitor = console_monitor
+    else:
+        monitor = None
+
+    if args.mesh is None:
+        mesh = np.linspace(args.e_min, args.e_0, num=args.n_points, endpoint=True)
+    else:
+        mesh = args.mesh
+
+    s = calculate_spectrum_mesh(args.e_0, args.theta, mesh, phi=args.phi, epsrel=args.epsrel, monitor=monitor)
+    x2, y2 = s.get_points()
+
+    if args.output is None:
+        [print("%.6g, %.6g" % (x, y)) for x, y in zip(x2, y2)]
+    elif ext == "csv":
+        s.export_csv(args.output)
+    elif ext == "xlsx":
+        s.export_xlsx(args.output)
+    elif ext == "pkl":
+        import pickle
+
+        with open(args.output, 'ab') as output:
+            pickle.dump(s, output, pickle.HIGHEST_PROTOCOL)
