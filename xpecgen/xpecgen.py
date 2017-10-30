@@ -104,8 +104,6 @@ def triangle(x, loc=0, size=0.5, area=1):
     """
     # t=abs((x-loc)/size)
     # return 0 if t>1 else (1-t)*abs(area/size)
-    # Temporal variable code is disabled to avoid problems with plot_function.
-    # See note there.
     return 0 if abs((x - loc) / size) > 1 else (1 - abs((x - loc) / size)) * abs(area / size)
 
 
@@ -752,30 +750,6 @@ def calculate_spectrum(e_0, theta, e_min, num_e, phi=0.0, epsrel=0.2, monitor=co
     return calculate_spectrum_mesh(e_0, theta, np.linspace(e_min, e_0, num=num_e, endpoint=True), phi=phi,
                                    epsrel=epsrel,
                                    monitor=monitor)
-
-
-# ---------------------Debug utilities----------------------------------#
-
-
-def plot_function(f, x_min, x_max, num=100):
-    """
-    Plot a function in an independent matplotlib window.
-
-    Args:
-        f: The function to plot.
-        x_min (float): Minimum argument value.
-        x_max (float): Maximum argument value.
-        num (int): Number of points to calculate for the plot.
-
-    """
-    x = np.linspace(x_min, x_max, num=num, endpoint=True)
-    # Instead of y=list(map(f,x)) we vectorize the function to deal with functions returning numpy arrays
-    # FIXME: This can lead to problems if local variables are used in the given function!!!
-    # Cf. triangle function for an example
-    f2 = np.vectorize(f)
-    y = f2(x)
-    plt.plot(x, y, '-')
-    plt.show()
 
 
 def cli():
