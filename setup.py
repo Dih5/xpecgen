@@ -123,6 +123,7 @@ setup(
     entry_points={
         'console_scripts': [
             'xpecgen=xpecgen.xpecgenGUI:main',
+            'xpecgencli=xpecgen.xpecgen:cli',
         ],
     },
 )
