@@ -720,7 +720,6 @@ def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=conso
     # they are suppressed.
     warnings.simplefilter("ignore")
 
-    # TODO: (?) multiprocessing might be added here in the future
     for i, e_g in enumerate(s.x):
         s.y.append(integrate_source(fluence, cs, mu,
                                     theta, e_g, e_0, phi=phi, epsrel=epsrel))
