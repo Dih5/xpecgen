@@ -15,9 +15,15 @@ import csv
 import numpy as np
 from scipy import interpolate, integrate, optimize
 import xlsxwriter
-import matplotlib.pyplot as plt
 
-plt.ion()
+try:
+    import matplotlib.pyplot as plt
+
+    plt.ion()
+    plot_available = True
+except ImportError:
+    warnings.warn("Unable to import matplotlib. Plotting will be disabled.")
+    plot_available = False
 
 __author__ = 'Dih5'
 __version__ = "1.1.0"
@@ -232,12 +238,15 @@ class Spectrum:
             block (bool): Whether the plot is blocking or non blocking.
 
         """
-        plt.clf()
-        self.get_plot(plt, show_mesh=show_mesh, prepare_format=False)
-        plt.xlabel("E")
-        plt.ylabel("f(E)")
-        plt.gcf().canvas.set_window_title("".join(('xpecgen v', __version__)))
-        plt.show(block=block)
+        if plot_available:
+            plt.clf()
+            self.get_plot(plt, show_mesh=show_mesh, prepare_format=False)
+            plt.xlabel("E")
+            plt.ylabel("f(E)")
+            plt.gcf().canvas.set_window_title("".join(('xpecgen v', __version__)))
+            plt.show(block=block)
+        else:
+            warnings.warn("Asked for a plot but matplotlib could not be imported.")
 
     def export_csv(self, route="a.csv", peak_shape=triangle, transpose=False):
         """
