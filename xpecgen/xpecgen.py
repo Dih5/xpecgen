@@ -779,7 +779,7 @@ def plot_function(f, x_min, x_max, num=100):
     plt.show()
 
 
-if __name__ == '__main__':
+def cli():
     import argparse
     import sys
 
@@ -846,3 +846,7 @@ if __name__ == '__main__':
 
         with open(args.output, 'ab') as output:
             pickle.dump(s, output, pickle.HIGHEST_PROTOCOL)
+
+
+if __name__ == '__main__':
+    cli()
