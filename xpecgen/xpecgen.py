@@ -812,6 +812,10 @@ def cli():
                              "If this argument is not provided, points are written to the standard output and "
                              "calculation monitor is not displayed.")
 
+    parser.add_argument('--overwrite', action="store_true",
+                        help="If this flag is set and the output is a pkl file, overwrite its content instead of "
+                             "appending.")
+
     args = parser.parse_args()
 
     if args.output is not None:
@@ -843,8 +847,13 @@ def cli():
         s.export_xlsx(args.output)
     elif ext == "pkl":
         import pickle
+        print(args.overwrite)
+        if args.overwrite:
+            mode = "wb"
+        else:
+            mode = "ab"
 
-        with open(args.output, 'ab') as output:
+        with open(args.output, mode) as output:
             pickle.dump(s, output, pickle.HIGHEST_PROTOCOL)
 
 
