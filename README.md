@@ -33,7 +33,7 @@ A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in 
 ### GUI
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoPar.png)
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoPlot.png)
-### Console
+### Python interpreter
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoConsole.png)
 
 ## Installation
@@ -41,12 +41,9 @@ If you have [pip](https://pip.pypa.io/en/stable/installing/) you can install xpe
 ```
 pip install xpecgen
 ```
-and then you can launch the GUI by just executing
-```
-xpecgen
-```
-or check the [demo.py](demo/demo.py) explaining its use as a library. You will need tk to make use of the GUI.
-You can check the [advanced guide](advanced.md) if you need help for this.
+and then you can launch the GUI by just executing `xpecgen`, see the command line interface by executing `xpecgencli -h`, or check the [demo.py](demo/demo.py) explaining its use as a library,
+
+You will need tk to make use of the GUI. You can check the [advanced guide](advanced.md) if you need help for this.
 
 If you do not have python installed yet, check the [advanced guide](advanced.md).
 
