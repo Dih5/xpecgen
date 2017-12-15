@@ -26,7 +26,7 @@ except ImportError:
     plot_available = False
 
 __author__ = 'Dih5'
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
