@@ -638,7 +638,7 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
     f = get_source_function(fluence, cs, mu, theta, e_g, phi=phi)
     (y, y_err) = custom_dblquad(f, x_min, x_max, e_g / e_0, 1, epsrel=epsrel, limit=100)
     # The factor includes n_med, its units being 1/(mb * r_CSDA). We only take into account the r_CSDA dependence.
-    y /= get_csda()(e_0)
+    y *= get_csda()(e_0)
     return y
 
 
