@@ -187,6 +187,9 @@ class XpecgenGUI(Notebook):
         self.Phi = DoubleVar()
         self.Phi.set(0.0)
 
+        self.Z = IntVar()
+        self.Z.set(74)
+
         self.EMin = DoubleVar()
         self.EMin.set(3.0)
 
@@ -247,9 +250,12 @@ class XpecgenGUI(Notebook):
                                unitsTxt="º", helpTxt="X-rays emission angle. The anode's normal is at 90º.", row=1)
         self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText=u"Elevation angle (\u03c6)",
                              unitsTxt="º", helpTxt="X-rays emission altitude. The anode's normal is at 0º.", row=2)
+        self.ParZ = ParBox(self.frmPhysPar, self.Z, lblText=u"Target atomic number",
+                             unitsTxt="", helpTxt="Atomic number of the target. Characteristic radiation is only calculated for Z=74", row=3)
         Grid.columnconfigure(self.frmPhysPar, 0, weight=0)
         Grid.columnconfigure(self.frmPhysPar, 1, weight=1)
-        Grid.columnconfigure(self.frmPhysPar, 2, weight=0)
+        Grid.columnconfigure(self.frmPhysPar, 2, weight=1)
+        Grid.columnconfigure(self.frmPhysPar, 3, weight=0)
 
         # -Numerical Parameters
         self.frmNumPar = LabelFrame(self.frmCalc, text="Numerical parameters")
@@ -539,7 +545,7 @@ class XpecgenGUI(Notebook):
 
         def callback():  # Carry the calculation in a different thread to avoid blocking
             s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(
-            ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor)
+            ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=self.Z.get())
             self.spectra = [s]
             self.queue_calculation.put(1)
 
