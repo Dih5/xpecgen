@@ -442,9 +442,7 @@ class XpecgenGUI(Notebook):
             self.subfig.clear()
             self.spectra[self.active_spec].get_plot(self.subfig)
             self.canvas.draw()
-            self.canvasToolbar._views.clear()
-            self.canvasToolbar._positions.clear()
-            self.canvasToolbar._update_view()
+            self.canvasToolbar.update()
             self.fig.tight_layout()
         else:
             # FIXME: Update if independent window is opened
