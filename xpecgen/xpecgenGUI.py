@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 
 import threading
 import queue
+from traceback import print_exc
 
 import os
 
@@ -544,10 +545,14 @@ class XpecgenGUI(Notebook):
             self.calculation_total = b
 
         def callback():  # Carry the calculation in a different thread to avoid blocking
-            s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(
-            ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=self.Z.get())
-            self.spectra = [s]
-            self.queue_calculation.put(1)
+            try:
+                s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=self.Z.get())
+                self.spectra = [s]
+                self.queue_calculation.put(True)
+            except Exception as e:
+                print_exc()
+                self.queue_calculation.put(False)
+                messagebox.showerror("Error", "An error occurred during the calculation:\n%s\nCheck the parameters are valid."%str(e))
 
         try:
             if self.calc_thread.is_alive():
@@ -577,15 +582,18 @@ class XpecgenGUI(Notebook):
 
         """
         self.monitor_bar(self.calculation_count, self.calculation_total)
-        if self.queue_calculation.full():
-            self.lstHistory.delete(0, END)
-            self.lstHistory.insert(END, "Calculated")
+        if self.queue_calculation.full():  # Calculation ended
             self.cmdCalculate["state"] = "normal"
-            self.enable_analyze_buttons()
             self.monitor_bar(0, 0)
-            self.active_spec = 0
-            self.update_plot()
-            self.select(1)  # Open analyse tab
+            if self.queue_calculation.get_nowait():  # Calculation ended successfully
+                self.lstHistory.delete(0, END)
+                self.lstHistory.insert(END, "Calculated")
+                self.enable_analyze_buttons()
+                self.active_spec = 0
+                self.update_plot()
+                self.select(1)  # Open analyse tab
+            else:
+                pass
         else:
             self.after(250, self.wait_for_calculation)
 
