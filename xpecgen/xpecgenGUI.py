@@ -537,12 +537,27 @@ class XpecgenGUI(Notebook):
         Calculates a new spectrum using the parameters in the GUI.
 
         """
+        # If a calculation was being held, abort it instead
+        try:
+            if self.calc_thread.is_alive():
+                self.abort_calculation = True
+                self.cmdCalculate["text"] = "(Aborting)"
+                self.cmdCalculate["state"] = "disabled"
+                return
+        except AttributeError:  # If there is no calculation thread, there is nothing to worry about
+            pass
+
         self.calculation_count = 0
         self.calculation_total = self.NumE.get()
 
-        def monitor(a, b):  # Values are only collected. Tk must be updated from main thread only.
+        def monitor(a, b):
+            # Will be executed in calculation thread. Values are only collected,
+            # Tk must be updated from main thread only.
             self.calculation_count = a
             self.calculation_total = b
+            if self.abort_calculation:
+                self.queue_calculation.put(False)
+                exit(1)
 
         def callback():  # Carry the calculation in a different thread to avoid blocking
             try:
@@ -554,26 +569,15 @@ class XpecgenGUI(Notebook):
                 self.queue_calculation.put(False)
                 messagebox.showerror("Error", "An error occurred during the calculation:\n%s\nCheck the parameters are valid."%str(e))
 
-        try:
-            if self.calc_thread.is_alive():
-                # NOTE: This point should be unreachable since cmdCalculate is disabled when calculated
-                # In a future it could serve to stop the calculation
-                print(
-                    "WARNING: The calculation can not be stopped in the current version.\nIf you want to abort it, close the application.",
-                    file=sys.stderr)
-                # TODO: Ask child to stop
-                return
-        except AttributeError:  # If there is no calculation thread, there is nothing to worry about
-            pass
+
         self.queue_calculation = queue.Queue(maxsize=1)
-        # The child will fill the queue to indicate it has ended.
-        # The father might fill the queue to ask the children to stop TODO: Not
-        # done yet
+        # The child will fill the queue with a value indicating whether an error occured.
+        self.abort_calculation = False  # Ask the calculation thread to end (when monitor is executed)
         self.calc_thread = threading.Thread(target=callback)
         self.calc_thread.setDaemon(True)
         self.calc_thread.start()
 
-        self.cmdCalculate["state"] = "disabled"
+        self.cmdCalculate["text"] = "Abort"
         self.after(250, self.wait_for_calculation)
 
     def wait_for_calculation(self):
@@ -583,6 +587,7 @@ class XpecgenGUI(Notebook):
         """
         self.monitor_bar(self.calculation_count, self.calculation_total)
         if self.queue_calculation.full():  # Calculation ended
+            self.cmdCalculate["text"] = "Calculate"
             self.cmdCalculate["state"] = "normal"
             self.monitor_bar(0, 0)
             if self.queue_calculation.get_nowait():  # Calculation ended successfully
