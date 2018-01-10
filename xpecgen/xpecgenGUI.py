@@ -27,6 +27,34 @@ from . import xpecgen as xg
 
 __author__ = "Dih5"
 
+_elements = ['Nihil', 'Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', 'Carbon, Graphite', 'Nitrogen', 'Oxygen',
+             'Fluorine', 'Neon', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Phosphorus', 'Sulfur', 'Chlorine',
+             'Argon', 'Potassium', 'Calcium', 'Scandium', 'Titanium', 'Vanadium', 'Chromium', 'Manganese', 'Iron',
+             'Cobalt', 'Nickel', 'Copper', 'Zinc', 'Gallium', 'Germanium', 'Arsenic', 'Selenium', 'Bromine', 'Krypton',
+             'Rubidium', 'Strontium', 'Yttrium', 'Zirconium', 'Niobium', 'Molybdenum', 'Technetium', 'Ruthenium',
+             'Rhodium', 'Palladium', 'Silver', 'Cadmium', 'Indium', 'Tin', 'Antimony', 'Tellurium', 'Iodine', 'Xenon',
+             'Cesium', 'Barium', 'Lanthanum', 'Cerium', 'Praseodymium', 'Neodymium', 'Promethium', 'Samarium',
+             'Europium', 'Gadolinium', 'Terbium', 'Dysprosium', 'Holmium', 'Erbium', 'Thulium', 'Ytterbium', 'Lutetium',
+             'Hafnium', 'Tantalum', 'Tungsten', 'Rhenium', 'Osmium', 'Iridium', 'Platinum', 'Gold', 'Mercury',
+             'Thallium', 'Lead', 'Bismuth', 'Polonium', 'Astatine', 'Radon', 'Francium', 'Radium', 'Actinium',
+             'Thorium', 'Protactinium', 'Uranium']
+
+
+def _add_element_name(material):
+    """Check if the string is a integer. If so, convert to element name, e.g., 13-> 13: Aluminum"""
+    try:
+        int(material)
+        return "%d: %s" % (int(material), _elements[int(material)])
+    except ValueError:
+        return material
+
+
+def _remove_element_name(material):
+    """Revert _add_element_name"""
+    if re.match("[0-9]+: .*", material):
+        return material.split(":")[0]
+    else:
+        return material
 
 class CreateToolTip(object):
     """
@@ -196,8 +224,8 @@ class XpecgenGUI(Notebook):
         self.Phi = DoubleVar()
         self.Phi.set(0.0)
 
-        self.Z = IntVar()
-        self.Z.set(74)
+        self.Z = StringVar()
+        self.Z.set(_add_element_name("74"))
 
         self.EMin = DoubleVar()
         self.EMin.set(3.0)
@@ -211,7 +239,7 @@ class XpecgenGUI(Notebook):
         # Operation-related variables
 
         self.AttenMaterial = StringVar()
-        self.AttenMaterial.set("13")
+        self.AttenMaterial.set(_add_element_name("13"))
 
         self.AttenThick = DoubleVar()
         self.AttenThick.set(0.1)
@@ -281,7 +309,7 @@ class XpecgenGUI(Notebook):
 
         available_list = list(set(target_list) & set(csda_list) & set(mu_list))
         available_list.sort(key=_human_order_key)
-        self.cmbZ["values"] = available_list
+        self.cmbZ["values"] = list(map(_add_element_name, available_list))
 
         Grid.columnconfigure(self.frmPhysPar, 0, weight=0)
         Grid.columnconfigure(self.frmPhysPar, 1, weight=1)
@@ -355,7 +383,7 @@ class XpecgenGUI(Notebook):
         self.lblAttenMaterial = Label(self.frmOperAtten, text="Material")
         self.lblAttenMaterial.grid()
         self.cmbAttenMaterial = Combobox(self.frmOperAtten, textvariable=self.AttenMaterial)
-        self.cmbAttenMaterial["values"] = mu_list
+        self.cmbAttenMaterial["values"] = list(map(_add_element_name, mu_list))
         self.cmbAttenMaterial.grid(row=0, column=1, sticky=E + W)
         self.ParAttenThick = ParBox(
             self.frmOperAtten, self.AttenThick, lblText="Thickness", unitsTxt="cm", row=1)
@@ -566,6 +594,7 @@ class XpecgenGUI(Notebook):
 
         self.calculation_count = 0
         self.calculation_total = self.NumE.get()
+        z = int(_remove_element_name(self.Z.get()))
 
         def monitor(a, b):
             # Will be executed in calculation thread. Values are only collected,
@@ -578,7 +607,7 @@ class XpecgenGUI(Notebook):
 
         def callback():  # Carry the calculation in a different thread to avoid blocking
             try:
-                s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=self.Z.get())
+                s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=z)
                 self.spectra = [s]
                 self.queue_calculation.put(True)
             except Exception as e:
@@ -626,7 +655,7 @@ class XpecgenGUI(Notebook):
         """
         s2 = self.spectra[-1].clone()
         s2.attenuate(self.AttenThick.get(),
-                     xg.get_mu(self.AttenMaterial.get()))
+                     xg.get_mu(_remove_element_name(self.AttenMaterial.get())))
         self.spectra.append(s2)
         self.lstHistory.insert(
             END, "Attenuated: " + str(self.AttenThick.get()) + "cm of " + self.AttenMaterial.get())
