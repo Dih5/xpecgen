@@ -271,12 +271,15 @@ class XpecgenGUI(Notebook):
         target_list = list(map(lambda x: (os.path.split(x)[1]).split(
             ".csv")[0], glob(os.path.join(xg.data_path, "cs", "*.csv"))))
         target_list.remove("grid")
-        target_list.sort(key=_human_order_key)
         # Available csda-data
         csda_list = list(map(lambda x: (os.path.split(x)[1]).split(
             ".csv")[0], glob(os.path.join(xg.data_path, "csda", "*.csv"))))
+        # Available attenuation data
+        mu_list = list(map(lambda x: (os.path.split(x)[1]).split(
+            ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
+        mu_list.sort(key=_human_order_key)  # Used later
 
-        available_list = list(set(target_list) & set(csda_list))
+        available_list = list(set(target_list) & set(csda_list) & set(mu_list))
         available_list.sort(key=_human_order_key)
         self.cmbZ["values"] = available_list
 
@@ -351,13 +354,8 @@ class XpecgenGUI(Notebook):
         self.frmOperAtten.grid(row=0, column=0, sticky=N + S + E + W)
         self.lblAttenMaterial = Label(self.frmOperAtten, text="Material")
         self.lblAttenMaterial.grid()
-        self.cmbAttenMaterial = Combobox(
-            self.frmOperAtten, textvariable=self.AttenMaterial)
-        material_list = list(map(lambda x: (os.path.split(x)[1]).split(
-            ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
-
-        material_list.sort(key=_human_order_key)
-        self.cmbAttenMaterial["values"] = material_list
+        self.cmbAttenMaterial = Combobox(self.frmOperAtten, textvariable=self.AttenMaterial)
+        self.cmbAttenMaterial["values"] = mu_list
         self.cmbAttenMaterial.grid(row=0, column=1, sticky=E + W)
         self.ParAttenThick = ParBox(
             self.frmOperAtten, self.AttenThick, lblText="Thickness", unitsTxt="cm", row=1)
