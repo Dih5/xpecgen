@@ -126,6 +126,14 @@ class ParBox:
         if read_only:
             self.txt["state"] = "readonly"
 
+def _human_order_key(text):
+    """
+    Key function to sort in human order.
+
+    """
+    # This is based in http://nedbatchelder.com/blog/200712/human_sorting.html
+    return [int(c) if c.isdigit() else c for c in re.split('(\d+)', text)]
+
 
 class XpecgenGUI(Notebook):
     """Tk-based GUI for the xpecgen package."""
@@ -251,8 +259,27 @@ class XpecgenGUI(Notebook):
                                unitsTxt="º", helpTxt="X-rays emission angle. The anode's normal is at 90º.", row=1)
         self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText=u"Elevation angle (\u03c6)",
                              unitsTxt="º", helpTxt="X-rays emission altitude. The anode's normal is at 0º.", row=2)
-        self.ParZ = ParBox(self.frmPhysPar, self.Z, lblText=u"Target atomic number",
-                             unitsTxt="", helpTxt="Atomic number of the target. Characteristic radiation is only calculated for Z=74", row=3)
+        self.lblZ = Label(self.frmPhysPar, text="Target atomic number")
+        self.lblZTT = CreateToolTip(self.lblZ,
+                                    "Atomic number of the target. Characteristic radiation is only calculated for Z=74")
+        self.lblZ.grid(row=3, column=0, sticky=W)
+        self.cmbZ = Combobox(self.frmPhysPar, textvariable=self.Z)
+        self.cmbZ.grid(row=3, column=1, sticky=W + E)
+        self.cmbZTT = CreateToolTip(self.cmbZ,
+                                    "Atomic number of the target. Characteristic radiation is only calculated for Z=74")
+        # Available cross-section data
+        target_list = list(map(lambda x: (os.path.split(x)[1]).split(
+            ".csv")[0], glob(os.path.join(xg.data_path, "cs", "*.csv"))))
+        target_list.remove("grid")
+        target_list.sort(key=_human_order_key)
+        # Available csda-data
+        csda_list = list(map(lambda x: (os.path.split(x)[1]).split(
+            ".csv")[0], glob(os.path.join(xg.data_path, "csda", "*.csv"))))
+
+        available_list = list(set(target_list) & set(csda_list))
+        available_list.sort(key=_human_order_key)
+        self.cmbZ["values"] = available_list
+
         Grid.columnconfigure(self.frmPhysPar, 0, weight=0)
         Grid.columnconfigure(self.frmPhysPar, 1, weight=1)
         Grid.columnconfigure(self.frmPhysPar, 2, weight=1)
@@ -329,15 +356,7 @@ class XpecgenGUI(Notebook):
         material_list = list(map(lambda x: (os.path.split(x)[1]).split(
             ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
 
-        def human_order_key(text):
-            """
-            Key function to sort in human order.
-
-            """
-            # This is based in http://nedbatchelder.com/blog/200712/human_sorting.html
-            return [int(c) if c.isdigit() else c for c in re.split('(\d+)', text)]
-
-        material_list.sort(key=human_order_key)
+        material_list.sort(key=_human_order_key)
         self.cmbAttenMaterial["values"] = material_list
         self.cmbAttenMaterial.grid(row=0, column=1, sticky=E + W)
         self.ParAttenThick = ParBox(
