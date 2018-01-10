@@ -32,7 +32,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.2.1',
+    version='1.2.2',
 
     description='A package with a GUI to calculate X-ray sPECtra GENerated in tungsten anodes',
     long_description=long_description,
