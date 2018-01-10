@@ -289,12 +289,12 @@ class XpecgenGUI(Notebook):
                              unitsTxt="º", helpTxt="X-rays emission altitude. The anode's normal is at 0º.", row=2)
         self.lblZ = Label(self.frmPhysPar, text="Target atomic number")
         self.lblZTT = CreateToolTip(self.lblZ,
-                                    "Atomic number of the target. Characteristic radiation is only calculated for Z=74")
+                                    "Atomic number of the target. IMPORTANT: Only used in the cross-section and distance scaling. Fluence uses a tugsten model, but the range is increased in lower Z materials. Besides, characteristic radiation is only calculated for tugsten.")
         self.lblZ.grid(row=3, column=0, sticky=W)
         self.cmbZ = Combobox(self.frmPhysPar, textvariable=self.Z)
         self.cmbZ.grid(row=3, column=1, sticky=W + E)
         self.cmbZTT = CreateToolTip(self.cmbZ,
-                                    "Atomic number of the target. Characteristic radiation is only calculated for Z=74")
+                                    "Atomic number of the target. IMPORTANT: Only used in the cross-section and distance scaling. Fluence uses a tugsten model, but the range is increased in lower Z materials. Besides, characteristic radiation is only calculated for tugsten.")
         # Available cross-section data
         target_list = list(map(lambda x: (os.path.split(x)[1]).split(
             ".csv")[0], glob(os.path.join(xg.data_path, "cs", "*.csv"))))
