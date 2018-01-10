@@ -12,7 +12,8 @@
 [![Documentation Status](https://readthedocs.org/projects/xpecgen/badge/?version=latest)](http://xpecgen.readthedocs.io/en/latest/?badge=latest)
 
 
-A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in tungsten anodes.
+A python package with a GUI to calculate **x**-ray s**pec**tra **gen**erated in tungsten anodes, as well as the
+bremsstrahlung component in other media.
 
 * [Features](#features)
 * [Usage example](#usage-example)
@@ -62,9 +63,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Model details
 To have a general overview of the model see [\[1\]](#Ref1).
-The bremsstrahlung calculation is done using full interpolations for the electron fluence, so none of the simplifications in section IV.C were used in this implementation.
+The bremsstrahlung calculation is done using full interpolations for the electron fluence, so none of the simplifications in section IV.C were used in this implementation. This description of the fluence can be used with others materials, always via the CSDA scaling, if requested. However, note that its accuracy has not been tested.
 Both characteristic peaks models in section II.D were implemented. The polynomial one is used by default.
 Half-value layers are calculated using the exponential model of attenuation (aka narrow beam geometry). In the GUI they are calculated in the sense of dose, but the library allows for generalizing this to any desired reponse function.
+
+Despite the GUI and the API allow selecting different target materials, note the model only considered tungsten in detail. When a different material is selected, its bremsstrahlung cross-section and range scaling are used instead. However, differences in the electron fluence in the target might affect the results. In particular, the penetration depth is increased in low Z materials in units of the CSDA range, so the results should be used with caution, specially in that case.
 
 ## Citation
 If you use this application to make use of the models in [\[1\]](#Ref1), you should cite it. If you also want to acknowledge the implementation itself you can also cite [\[2\]](#Ref2).

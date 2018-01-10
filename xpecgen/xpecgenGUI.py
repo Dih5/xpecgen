@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 
 import threading
 import queue
+from traceback import print_exc
 
 import os
 
@@ -26,6 +27,34 @@ from . import xpecgen as xg
 
 __author__ = "Dih5"
 
+_elements = ['Nihil', 'Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', 'Carbon, Graphite', 'Nitrogen', 'Oxygen',
+             'Fluorine', 'Neon', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Phosphorus', 'Sulfur', 'Chlorine',
+             'Argon', 'Potassium', 'Calcium', 'Scandium', 'Titanium', 'Vanadium', 'Chromium', 'Manganese', 'Iron',
+             'Cobalt', 'Nickel', 'Copper', 'Zinc', 'Gallium', 'Germanium', 'Arsenic', 'Selenium', 'Bromine', 'Krypton',
+             'Rubidium', 'Strontium', 'Yttrium', 'Zirconium', 'Niobium', 'Molybdenum', 'Technetium', 'Ruthenium',
+             'Rhodium', 'Palladium', 'Silver', 'Cadmium', 'Indium', 'Tin', 'Antimony', 'Tellurium', 'Iodine', 'Xenon',
+             'Cesium', 'Barium', 'Lanthanum', 'Cerium', 'Praseodymium', 'Neodymium', 'Promethium', 'Samarium',
+             'Europium', 'Gadolinium', 'Terbium', 'Dysprosium', 'Holmium', 'Erbium', 'Thulium', 'Ytterbium', 'Lutetium',
+             'Hafnium', 'Tantalum', 'Tungsten', 'Rhenium', 'Osmium', 'Iridium', 'Platinum', 'Gold', 'Mercury',
+             'Thallium', 'Lead', 'Bismuth', 'Polonium', 'Astatine', 'Radon', 'Francium', 'Radium', 'Actinium',
+             'Thorium', 'Protactinium', 'Uranium']
+
+
+def _add_element_name(material):
+    """Check if the string is a integer. If so, convert to element name, e.g., 13-> 13: Aluminum"""
+    try:
+        int(material)
+        return "%d: %s" % (int(material), _elements[int(material)])
+    except ValueError:
+        return material
+
+
+def _remove_element_name(material):
+    """Revert _add_element_name"""
+    if re.match("[0-9]+: .*", material):
+        return material.split(":")[0]
+    else:
+        return material
 
 class CreateToolTip(object):
     """
@@ -125,6 +154,14 @@ class ParBox:
         if read_only:
             self.txt["state"] = "readonly"
 
+def _human_order_key(text):
+    """
+    Key function to sort in human order.
+
+    """
+    # This is based in http://nedbatchelder.com/blog/200712/human_sorting.html
+    return [int(c) if c.isdigit() else c for c in re.split('(\d+)', text)]
+
 
 class XpecgenGUI(Notebook):
     """Tk-based GUI for the xpecgen package."""
@@ -187,6 +224,9 @@ class XpecgenGUI(Notebook):
         self.Phi = DoubleVar()
         self.Phi.set(0.0)
 
+        self.Z = StringVar()
+        self.Z.set(_add_element_name("74"))
+
         self.EMin = DoubleVar()
         self.EMin.set(3.0)
 
@@ -199,7 +239,7 @@ class XpecgenGUI(Notebook):
         # Operation-related variables
 
         self.AttenMaterial = StringVar()
-        self.AttenMaterial.set("13")
+        self.AttenMaterial.set(_add_element_name("13"))
 
         self.AttenThick = DoubleVar()
         self.AttenThick.set(0.1)
@@ -247,9 +287,34 @@ class XpecgenGUI(Notebook):
                                unitsTxt="º", helpTxt="X-rays emission angle. The anode's normal is at 90º.", row=1)
         self.ParPhi = ParBox(self.frmPhysPar, self.Phi, lblText=u"Elevation angle (\u03c6)",
                              unitsTxt="º", helpTxt="X-rays emission altitude. The anode's normal is at 0º.", row=2)
+        self.lblZ = Label(self.frmPhysPar, text="Target atomic number")
+        self.lblZTT = CreateToolTip(self.lblZ,
+                                    "Atomic number of the target. IMPORTANT: Only used in the cross-section and distance scaling. Fluence uses a tugsten model, but the range is increased in lower Z materials. Besides, characteristic radiation is only calculated for tugsten.")
+        self.lblZ.grid(row=3, column=0, sticky=W)
+        self.cmbZ = Combobox(self.frmPhysPar, textvariable=self.Z)
+        self.cmbZ.grid(row=3, column=1, sticky=W + E)
+        self.cmbZTT = CreateToolTip(self.cmbZ,
+                                    "Atomic number of the target. IMPORTANT: Only used in the cross-section and distance scaling. Fluence uses a tugsten model, but the range is increased in lower Z materials. Besides, characteristic radiation is only calculated for tugsten.")
+        # Available cross-section data
+        target_list = list(map(lambda x: (os.path.split(x)[1]).split(
+            ".csv")[0], glob(os.path.join(xg.data_path, "cs", "*.csv"))))
+        target_list.remove("grid")
+        # Available csda-data
+        csda_list = list(map(lambda x: (os.path.split(x)[1]).split(
+            ".csv")[0], glob(os.path.join(xg.data_path, "csda", "*.csv"))))
+        # Available attenuation data
+        mu_list = list(map(lambda x: (os.path.split(x)[1]).split(
+            ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
+        mu_list.sort(key=_human_order_key)  # Used later
+
+        available_list = list(set(target_list) & set(csda_list) & set(mu_list))
+        available_list.sort(key=_human_order_key)
+        self.cmbZ["values"] = list(map(_add_element_name, available_list))
+
         Grid.columnconfigure(self.frmPhysPar, 0, weight=0)
         Grid.columnconfigure(self.frmPhysPar, 1, weight=1)
-        Grid.columnconfigure(self.frmPhysPar, 2, weight=0)
+        Grid.columnconfigure(self.frmPhysPar, 2, weight=1)
+        Grid.columnconfigure(self.frmPhysPar, 3, weight=0)
 
         # -Numerical Parameters
         self.frmNumPar = LabelFrame(self.frmCalc, text="Numerical parameters")
@@ -317,21 +382,8 @@ class XpecgenGUI(Notebook):
         self.frmOperAtten.grid(row=0, column=0, sticky=N + S + E + W)
         self.lblAttenMaterial = Label(self.frmOperAtten, text="Material")
         self.lblAttenMaterial.grid()
-        self.cmbAttenMaterial = Combobox(
-            self.frmOperAtten, textvariable=self.AttenMaterial)
-        material_list = list(map(lambda x: (os.path.split(x)[1]).split(
-            ".csv")[0], glob(os.path.join(xg.data_path, "mu", "*.csv"))))
-
-        def human_order_key(text):
-            """
-            Key function to sort in human order.
-
-            """
-            # This is based in http://nedbatchelder.com/blog/200712/human_sorting.html
-            return [int(c) if c.isdigit() else c for c in re.split('(\d+)', text)]
-
-        material_list.sort(key=human_order_key)
-        self.cmbAttenMaterial["values"] = material_list
+        self.cmbAttenMaterial = Combobox(self.frmOperAtten, textvariable=self.AttenMaterial)
+        self.cmbAttenMaterial["values"] = list(map(_add_element_name, mu_list))
         self.cmbAttenMaterial.grid(row=0, column=1, sticky=E + W)
         self.ParAttenThick = ParBox(
             self.frmOperAtten, self.AttenThick, lblText="Thickness", unitsTxt="cm", row=1)
@@ -530,39 +582,48 @@ class XpecgenGUI(Notebook):
         Calculates a new spectrum using the parameters in the GUI.
 
         """
-        self.calculation_count = 0
-        self.calculation_total = self.NumE.get()
-
-        def monitor(a, b):  # Values are only collected. Tk must be updated from main thread only.
-            self.calculation_count = a
-            self.calculation_total = b
-
-        def callback():  # Carry the calculation in a different thread to avoid blocking
-            s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(
-            ), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor)
-            self.spectra = [s]
-            self.queue_calculation.put(1)
-
+        # If a calculation was being held, abort it instead
         try:
             if self.calc_thread.is_alive():
-                # NOTE: This point should be unreachable since cmdCalculate is disabled when calculated
-                # In a future it could serve to stop the calculation
-                print(
-                    "WARNING: The calculation can not be stopped in the current version.\nIf you want to abort it, close the application.",
-                    file=sys.stderr)
-                # TODO: Ask child to stop
+                self.abort_calculation = True
+                self.cmdCalculate["text"] = "(Aborting)"
+                self.cmdCalculate["state"] = "disabled"
                 return
         except AttributeError:  # If there is no calculation thread, there is nothing to worry about
             pass
+
+        self.calculation_count = 0
+        self.calculation_total = self.NumE.get()
+        z = int(_remove_element_name(self.Z.get()))
+
+        def monitor(a, b):
+            # Will be executed in calculation thread. Values are only collected,
+            # Tk must be updated from main thread only.
+            self.calculation_count = a
+            self.calculation_total = b
+            if self.abort_calculation:
+                self.queue_calculation.put(False)
+                exit(1)
+
+        def callback():  # Carry the calculation in a different thread to avoid blocking
+            try:
+                s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=z)
+                self.spectra = [s]
+                self.queue_calculation.put(True)
+            except Exception as e:
+                print_exc()
+                self.queue_calculation.put(False)
+                messagebox.showerror("Error", "An error occurred during the calculation:\n%s\nCheck the parameters are valid."%str(e))
+
+
         self.queue_calculation = queue.Queue(maxsize=1)
-        # The child will fill the queue to indicate it has ended.
-        # The father might fill the queue to ask the children to stop TODO: Not
-        # done yet
+        # The child will fill the queue with a value indicating whether an error occured.
+        self.abort_calculation = False  # Ask the calculation thread to end (when monitor is executed)
         self.calc_thread = threading.Thread(target=callback)
         self.calc_thread.setDaemon(True)
         self.calc_thread.start()
 
-        self.cmdCalculate["state"] = "disabled"
+        self.cmdCalculate["text"] = "Abort"
         self.after(250, self.wait_for_calculation)
 
     def wait_for_calculation(self):
@@ -571,15 +632,19 @@ class XpecgenGUI(Notebook):
 
         """
         self.monitor_bar(self.calculation_count, self.calculation_total)
-        if self.queue_calculation.full():
-            self.lstHistory.delete(0, END)
-            self.lstHistory.insert(END, "Calculated")
+        if self.queue_calculation.full():  # Calculation ended
+            self.cmdCalculate["text"] = "Calculate"
             self.cmdCalculate["state"] = "normal"
-            self.enable_analyze_buttons()
             self.monitor_bar(0, 0)
-            self.active_spec = 0
-            self.update_plot()
-            self.select(1)  # Open analyse tab
+            if self.queue_calculation.get_nowait():  # Calculation ended successfully
+                self.lstHistory.delete(0, END)
+                self.lstHistory.insert(END, "Calculated")
+                self.enable_analyze_buttons()
+                self.active_spec = 0
+                self.update_plot()
+                self.select(1)  # Open analyse tab
+            else:
+                pass
         else:
             self.after(250, self.wait_for_calculation)
 
@@ -590,7 +655,7 @@ class XpecgenGUI(Notebook):
         """
         s2 = self.spectra[-1].clone()
         s2.attenuate(self.AttenThick.get(),
-                     xg.get_mu(self.AttenMaterial.get()))
+                     xg.get_mu(_remove_element_name(self.AttenMaterial.get())))
         self.spectra.append(s2)
         self.lstHistory.insert(
             END, "Attenuated: " + str(self.AttenThick.get()) + "cm of " + self.AttenMaterial.get())

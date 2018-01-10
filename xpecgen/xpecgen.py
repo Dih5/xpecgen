@@ -26,7 +26,7 @@ except ImportError:
     plot_available = False
 
 __author__ = 'Dih5'
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -482,12 +482,13 @@ def get_fluence(e_0=100.0):
     # return lambda x,u:f(x,u)[0]
 
 
-def get_cs(e_0=100):
+def get_cs(e_0=100, z=74):
     """
     Returns a function representing the scaled bremsstrahlung cross_section.
 
     Args:
         e_0 (float): The electron kinetic energy, used to scale u=e_e/e_0.
+        z (int): Atomic number of the material.
 
     Returns:
         A function representing cross_section(e_g,u) in mb/keV, with e_g in keV.
@@ -504,7 +505,7 @@ def get_cs(e_0=100):
         t = next(r)
         k = np.array([float(a) for a in t[0].split(",")])
     t = []
-    with open(os.path.join(data_path, "cs/74.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "cs/%d.csv" % z), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         for row in r:
@@ -512,7 +513,7 @@ def get_cs(e_0=100):
     t = np.array(t)
     scaled = interpolate.RectBivariateSpline(log_e_e, k, t, kx=3, ky=1)
     m_electron = 511
-    z2 = 74 * 74
+    z2 = z * z
     return lambda e_g, u: (u * e_0 + m_electron) ** 2 * z2 / (u * e_0 * e_g * (u * e_0 + 2 * m_electron)) * (
         scaled(np.log10(u * e_0), e_g / (u * e_0)))
 
@@ -538,15 +539,18 @@ def get_mu(z=74):
     return log_interp_1d(x, y)
 
 
-def get_csda():
+def get_csda(z=74):
     """
     Returns a function representing the CSDA range in tungsten.
+
+    Args:
+        z (int): Atomic number of the material.
 
     Returns:
         The CSDA range in cm in tungsten as a function of the electron kinetic energy in keV.
 
     """
-    with open(os.path.join(data_path, "csda/74.csv"), 'r') as csvfile:
+    with open(os.path.join(data_path, "csda/%d.csv" % z), 'r') as csvfile:
         r = csv.reader(csvfile, delimiter=' ', quotechar='|',
                        quoting=csv.QUOTE_MINIMAL)
         t = next(r)
@@ -556,18 +560,20 @@ def get_csda():
     return interpolate.interp1d(x, y, kind='linear')
 
 
-def get_mu_csda(e_0):
+def get_mu_csda(e_0, z=74):
     """
     Returns a function representing the CSDA-scaled energy-dependent attenuation coefficient in tungsten.
 
     Args:
         e_0 (float): The electron initial kinetic energy.
+        z (int): Atomic number of the material.
 
     Returns:
         The attenuation coefficient mu(E) in CSDA units as a function of the energy measured in keV.
+
     """
-    mu = get_mu(74)
-    csda = get_csda()(e_0)
+    mu = get_mu(z)
+    csda = get_csda(z=z)(e_0)
     return lambda e: mu(e) * csda
 
 
@@ -612,7 +618,7 @@ def get_source_function(fluence, cs, mu, theta, e_g, phi=0.0):
     return lambda u, x: fluence(x, u) * cs(e_g, u) * math.exp(factor * x)
 
 
-def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max=0.6, epsrel=0.1):
+def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max=0.6, epsrel=0.1, z=74):
     """
     Find the integral of the attenuated source function.
 
@@ -629,6 +635,7 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
         x_min: The lower-bound of the integral in depth, scaled by the CSDA range.
         x_max: The upper-bound of the integral in depth, scaled by the CSDA range.
         epsrel: The relative tolerance of the integral.
+        z (int): Atomic number of the material.
 
     Returns:
         float: The value of the integral.
@@ -638,13 +645,14 @@ def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max
     f = get_source_function(fluence, cs, mu, theta, e_g, phi=phi)
     (y, y_err) = custom_dblquad(f, x_min, x_max, e_g / e_0, 1, epsrel=epsrel, limit=100)
     # The factor includes n_med, its units being 1/(mb * r_CSDA). We only take into account the r_CSDA dependence.
-    y *= get_csda()(e_0)
+    y *= get_csda(z=z)(e_0)
     return y
 
 
 def add_char_radiation(s, method="fraction_above_poly"):
     """
-    Adds characteristic radiation to a calculated bremsstrahlung spectrum.
+    Adds characteristic radiation to a calculated bremsstrahlung spectrum, assuming it is a tungsten-generated spectrum
+
     If a discrete component already exists in the spectrum, it is replaced.
 
     Args:
@@ -696,7 +704,7 @@ def console_monitor(a, b):
     print("Calculation: ", a, "/", b)
 
 
-def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=console_monitor):
+def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=console_monitor, z=74):
     """
     Calculates the x-ray spectrum for given parameters.
     Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
@@ -708,6 +716,7 @@ def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=conso
         phi (float): X-ray emission elevation angle in degrees.
         epsrel (float): The tolerance parameter used in numeric integration.
         monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
+        z (int): Atomic number of the material.
 
     Returns:
         :obj:`Spectrum`: The calculated spectrum
@@ -719,8 +728,8 @@ def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=conso
     mesh_len = len(mesh)
     # Prepare integrand function
     fluence = get_fluence(e_0)
-    cs = get_cs(e_0)
-    mu = get_mu_csda(e_0)
+    cs = get_cs(e_0, z=z)
+    mu = get_mu_csda(e_0, z=z)
 
     # quad may raise warnings about the numerical integration method,
     # which are related to the estimated accuracy. Since this is not relevant,
@@ -728,17 +737,17 @@ def calculate_spectrum_mesh(e_0, theta, mesh, phi=0.0, epsrel=0.2, monitor=conso
     warnings.simplefilter("ignore")
 
     for i, e_g in enumerate(s.x):
-        s.y.append(integrate_source(fluence, cs, mu,
-                                    theta, e_g, e_0, phi=phi, epsrel=epsrel))
+        s.y.append(integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=phi, epsrel=epsrel, z=z))
         if monitor is not None:
             monitor(i + 1, mesh_len)
 
-    add_char_radiation(s)
+    if z == 74:
+        add_char_radiation(s)
 
     return s
 
 
-def calculate_spectrum(e_0, theta, e_min, num_e, phi=0.0, epsrel=0.2, monitor=console_monitor):
+def calculate_spectrum(e_0, theta, e_min, num_e, phi=0.0, epsrel=0.2, monitor=console_monitor, z=74):
     """
     Calculates the x-ray spectrum for given parameters.
     Characteristic peaks are also calculated by add_char_radiation, which is called with the default parameters.
@@ -751,14 +760,14 @@ def calculate_spectrum(e_0, theta, e_min, num_e, phi=0.0, epsrel=0.2, monitor=co
         phi (float): X-ray emission elevation angle in degrees.
         epsrel (float): The tolerance parameter used in numeric integration.
         monitor: A function to be called after each iteration with arguments finished_count, total_count. See for example :obj:`console_monitor`.
+        z (int): Atomic number of the material.
 
     Returns:
         :obj:`Spectrum`: The calculated spectrum
 
     """
     return calculate_spectrum_mesh(e_0, theta, np.linspace(e_min, e_0, num=num_e, endpoint=True), phi=phi,
-                                   epsrel=epsrel,
-                                   monitor=monitor)
+                                   epsrel=epsrel, monitor=monitor, z=z)
 
 
 def cli():
@@ -773,6 +782,9 @@ def cli():
 
     parser.add_argument('--phi', metavar='phi', type=float, default=0,
                         help="X-ray emission altitude in degrees, the anode's normal being at 0º.")
+
+    parser.add_argument('--z', metavar='z', type=int, default=74,
+                        help="Atomic number of the material (characteristic radiation is only available for z=74).")
 
     parser.add_argument('--e_min', metavar='e_min', type=float, default=3.0,
                         help="Minimum kinetic energy in keV in the bremsstrahlung calculation.")
@@ -818,7 +830,7 @@ def cli():
     else:
         mesh = args.mesh
 
-    s = calculate_spectrum_mesh(args.e_0, args.theta, mesh, phi=args.phi, epsrel=args.epsrel, monitor=monitor)
+    s = calculate_spectrum_mesh(args.e_0, args.theta, mesh, phi=args.phi, epsrel=args.epsrel, monitor=monitor, z=args.z)
     x2, y2 = s.get_points()
 
     if args.output is None:
