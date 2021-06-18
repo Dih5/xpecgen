@@ -10,7 +10,7 @@ from tkinter.ttk import *
 import tkinter.filedialog
 from tkinter import messagebox
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTk, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
 import threading
@@ -55,6 +55,7 @@ def _remove_element_name(material):
         return material.split(":")[0]
     else:
         return material
+
 
 class CreateToolTip(object):
     """
@@ -153,6 +154,7 @@ class ParBox:
             self.txtTT = CreateToolTip(self.txt, helpTxt)
         if read_only:
             self.txt["state"] = "readonly"
+
 
 def _human_order_key(text):
     """
@@ -423,14 +425,13 @@ class XpecgenGUI(Notebook):
             self.fig = Figure(figsize=(5, 4), dpi=100,
                               facecolor=self.master["bg"])
             self.subfig = self.fig.add_subplot(111)
-            self.canvas = FigureCanvasTkAgg(self.fig, master=self.frmPlot)
-            self.canvas.show()
+            self.canvas = FigureCanvasTk(self.fig, master=self.frmPlot)
+            self.canvas.draw()
             self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
-            self.canvasToolbar = NavigationToolbar2TkAgg(
-                self.canvas, self.frmPlot)
+            self.canvasToolbar = NavigationToolbar2Tk(self.canvas, self.frmPlot)
             self.canvasToolbar.update()
-            self.canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
+            self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
             self.frmPlot.grid(row=0, column=1, rowspan=3, sticky=N + S + E + W)
 
@@ -607,14 +608,16 @@ class XpecgenGUI(Notebook):
 
         def callback():  # Carry the calculation in a different thread to avoid blocking
             try:
-                s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(), self.NumE.get(), phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=z)
+                s = xg.calculate_spectrum(self.E0.get(), self.Theta.get(), self.EMin.get(), self.NumE.get(),
+                                          phi=self.Phi.get(), epsrel=self.Eps.get(), monitor=monitor, z=z)
                 self.spectra = [s]
                 self.queue_calculation.put(True)
             except Exception as e:
                 print_exc()
                 self.queue_calculation.put(False)
-                messagebox.showerror("Error", "An error occurred during the calculation:\n%s\nCheck the parameters are valid."%str(e))
-
+                messagebox.showerror("Error",
+                                     "An error occurred during the calculation:\n%s\nCheck the parameters are valid." % str(
+                                         e))
 
         self.queue_calculation = queue.Queue(maxsize=1)
         # The child will fill the queue with a value indicating whether an error occured.
