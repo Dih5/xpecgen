@@ -36,6 +36,14 @@ bremsstrahlung component in other media.
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoPlot.png)
 ### Python interpreter
 ![alt tag](https://raw.github.com/dih5/xpecgen/master/img/DemoConsole.png)
+```python
+from xpecgen import xpecgen as xg
+s=xg.calculate_spectrum(100, 12, 3, 150)
+s.attenuate(0.12, xg.get_mu(13))
+s.attenuate(100, xg.get_mu("air"))
+s.export_xlsx("spectrum.xlsx")
+s.show_plot()
+```
 
 ## Installation
 If you have [pip](https://pip.pypa.io/en/stable/installing/) you can install xpecgen as a package by running
