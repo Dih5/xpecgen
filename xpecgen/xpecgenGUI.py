@@ -10,7 +10,7 @@ from tkinter.ttk import *
 import tkinter.filedialog
 from tkinter import messagebox
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
 import threading
@@ -18,6 +18,7 @@ import queue
 from traceback import print_exc
 
 import os
+import sys
 
 from glob import glob
 
@@ -160,7 +161,7 @@ def _human_order_key(text):
 
     """
     # This is based in http://nedbatchelder.com/blog/200712/human_sorting.html
-    return [int(c) if c.isdigit() else c for c in re.split('(\d+)', text)]
+    return [int(c) if c.isdigit() else c for c in re.split(r'(\d+)', text)]
 
 
 class XpecgenGUI(Notebook):
@@ -420,14 +421,21 @@ class XpecgenGUI(Notebook):
         self.frmPlot = Frame(self.frmAnal)
 
         try:
+            # Convert the Tk background color name to a hex string that
+            # matplotlib understands (e.g. "SystemButtonFace" is Tk-only).
+            try:
+                r, g, b = (v // 256 for v in self.master.winfo_rgb(self.master["bg"]))
+                facecolor = "#%02x%02x%02x" % (r, g, b)
+            except Exception:
+                facecolor = None
             self.fig = Figure(figsize=(5, 4), dpi=100,
-                              facecolor=self.master["bg"])
+                              facecolor=facecolor)
             self.subfig = self.fig.add_subplot(111)
             self.canvas = FigureCanvasTkAgg(self.fig, master=self.frmPlot)
-            self.canvas.show()
+            self.canvas.draw()
             self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
-            self.canvasToolbar = NavigationToolbar2TkAgg(
+            self.canvasToolbar = NavigationToolbar2Tk(
                 self.canvas, self.frmPlot)
             self.canvasToolbar.update()
             self.canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
