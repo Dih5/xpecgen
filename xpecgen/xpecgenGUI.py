@@ -424,10 +424,12 @@ class XpecgenGUI(Notebook):
             # Convert the Tk background color name to a hex string that
             # matplotlib understands (e.g. "SystemButtonFace" is Tk-only).
             try:
-                r, g, b = (v // 256 for v in self.master.winfo_rgb(self.master["bg"]))
-                facecolor = "#%02x%02x%02x" % (r, g, b)
-            except Exception:
+                rgb = self.master.winfo_rgb(self.master["bg"])
+            except TclError:
                 facecolor = None
+            else:
+                r, g, b = (v // 256 for v in rgb)
+                facecolor = "#%02x%02x%02x" % (r, g, b)
             self.fig = Figure(figsize=(5, 4), dpi=100,
                               facecolor=facecolor)
             self.subfig = self.fig.add_subplot(111)
