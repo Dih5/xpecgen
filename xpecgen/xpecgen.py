@@ -16,6 +16,12 @@ import numpy as np
 from scipy import interpolate, integrate, optimize
 import xlsxwriter
 
+# scipy renamed integrate.simps to integrate.simpson (and removed simps in 1.14).
+try:
+    from scipy.integrate import simpson as _simpson
+except ImportError:  # pragma: no cover - old scipy
+    from scipy.integrate import simps as _simpson
+
 try:
     import matplotlib.pyplot as plt
 
@@ -331,7 +337,7 @@ class Spectrum:
         else:
             w = weight
         y2 = list(map(lambda x, y: w(x) * y, self.x, self.y))
-        return integrate.simps(y2, x=self.x) + sum([w(a[0]) * a[1] for a in self.discrete])
+        return _simpson(y2, x=self.x) + sum([w(a[0]) * a[1] for a in self.discrete])
 
     def set_norm(self, value=1, weight=None):
         """
@@ -380,11 +386,11 @@ class Spectrum:
         # Normalize to 1 with weighting function
         y2 = list(map(lambda a, b: weight(a) * b, x, y))
         discrete2 = [weight(a[0]) * a[1] for a in self.discrete]
-        n2 = integrate.simps(y2, x=x) + sum(discrete2)
+        n2 = _simpson(y2, x=x) + sum(discrete2)
         y3 = [a / n2 for a in y2]
         discrete3 = [[a[0], weight(a[0]) * a[1] / n2] for a in self.discrete]
         # Now we only need to add attenuation as a function of depth
-        f = lambda t: integrate.simps(list(map(lambda a, b: b * math.exp(-mu(a) * t), x, y3)), x=x) + sum(
+        f = lambda t: _simpson(list(map(lambda a, b: b * math.exp(-mu(a) * t), x, y3)), x=x) + sum(
             [c[1] * math.exp(-mu(c[0]) * t) for c in discrete3]) - value
         # Search the order of magnitude of the root (using the fact that f is
         # monotonically decreasing)
@@ -615,7 +621,9 @@ def get_source_function(fluence, cs, mu, theta, e_g, phi=0.0):
 
     """
     factor = -mu(e_g) / math.sin(math.radians(theta)) / math.cos(math.radians(phi))
-    return lambda u, x: fluence(x, u) * cs(e_g, u) * math.exp(factor * x)
+    # fluence and cs return 1x1 numpy arrays; scipy.integrate.quad requires a
+    # Python scalar, so collapse the result with .item().
+    return lambda u, x: np.asarray(fluence(x, u) * cs(e_g, u) * math.exp(factor * x)).item()
 
 
 def integrate_source(fluence, cs, mu, theta, e_g, e_0, phi=0.0, x_min=0.0, x_max=0.6, epsrel=0.1, z=74):
