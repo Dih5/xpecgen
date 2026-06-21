@@ -32,7 +32,7 @@ except ImportError:
     plot_available = False
 
 __author__ = 'Dih5'
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
